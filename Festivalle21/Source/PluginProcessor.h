@@ -54,6 +54,11 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 private:
+
+    double sampleRate;
+    double samplesPerBlock;
+    
+    juce::OSCSender sender;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Festivalle21AudioProcessor)
 };

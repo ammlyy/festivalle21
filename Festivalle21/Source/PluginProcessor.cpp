@@ -22,6 +22,11 @@ Festivalle21AudioProcessor::Festivalle21AudioProcessor()
                        )
 #endif
 {
+    this->sampleRate = 0.0;
+    this->samplesPerBlock = 0.0;
+    // specify here where to send OSC messages to: host URL and UDP port number
+    if (!sender.connect("192.168.1.180", 9001))   // [4]
+        DBG("Error: could not connect to UDP port 9001.");
 }
 
 Festivalle21AudioProcessor::~Festivalle21AudioProcessor()
@@ -95,6 +100,8 @@ void Festivalle21AudioProcessor::prepareToPlay (double sampleRate, int samplesPe
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+    this->sampleRate = sampleRate;
+    this->samplesPerBlock = samplesPerBlock;
 }
 
 void Festivalle21AudioProcessor::releaseResources()
@@ -132,6 +139,7 @@ void Festivalle21AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
+    
 
     // In case we have more outputs than inputs, this code clears any output
     // channels that didn't contain input data, (because these aren't
@@ -153,6 +161,12 @@ void Festivalle21AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         auto* channelData = buffer.getWritePointer (channel);
 
         // ..do something to the data...
+    }
+    // create and send an OSC message with an address and a float value:
+    if (!sender.send("/juce/RMS", (float)buffer.getRMSLevel(0, 0, samplesPerBlock)))
+        DBG("Error: could not send OSC message.");
+    else {
+        DBG("SENT!");
     }
 }
 
