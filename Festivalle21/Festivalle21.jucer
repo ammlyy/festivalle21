@@ -4,6 +4,110 @@
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1">
   <MAINGROUP id="o6mKob" name="Festivalle21">
     <GROUP id="{8919C6B9-B79B-DB30-D6F5-6F616A95C221}" name="Source">
+      <GROUP id="{F4F07E61-D811-6788-975A-88017AE06122}" name="fdeep">
+        <FILE id="bynJOZ" name="common.hpp" compile="0" resource="0" file="Source/fdeep/common.hpp"/>
+        <FILE id="cA97kM" name="convolution.hpp" compile="0" resource="0" file="Source/fdeep/convolution.hpp"/>
+        <FILE id="GKtVDJ" name="convolution_im2col.hpp" compile="0" resource="0"
+              file="Source/fdeep/convolution_im2col.hpp"/>
+        <FILE id="Hbz6Mp" name="fdeep.hpp" compile="0" resource="0" file="Source/fdeep/fdeep.hpp"/>
+        <FILE id="XXIkf9" name="filter.hpp" compile="0" resource="0" file="Source/fdeep/filter.hpp"/>
+        <FILE id="P2o6KN" name="import_model.hpp" compile="0" resource="0"
+              file="Source/fdeep/import_model.hpp"/>
+        <FILE id="nq6P2A" name="model.hpp" compile="0" resource="0" file="Source/fdeep/model.hpp"/>
+        <FILE id="qgSTej" name="node.hpp" compile="0" resource="0" file="Source/fdeep/node.hpp"/>
+        <FILE id="kzUNU3" name="recurrent_ops.hpp" compile="0" resource="0"
+              file="Source/fdeep/recurrent_ops.hpp"/>
+        <FILE id="cZUE14" name="shape2.hpp" compile="0" resource="0" file="Source/fdeep/shape2.hpp"/>
+        <FILE id="WIPgkd" name="tensor.hpp" compile="0" resource="0" file="Source/fdeep/tensor.hpp"/>
+        <FILE id="FlbAtj" name="tensor_pos.hpp" compile="0" resource="0" file="Source/fdeep/tensor_pos.hpp"/>
+        <FILE id="lWyzLM" name="tensor_shape.hpp" compile="0" resource="0"
+              file="Source/fdeep/tensor_shape.hpp"/>
+        <FILE id="f7s8DJ" name="tensor_shape_variable.hpp" compile="0" resource="0"
+              file="Source/fdeep/tensor_shape_variable.hpp"/>
+        <GROUP id="{CB615C1D-776E-3591-C875-EE75313642E8}" name="layers">
+          <FILE id="MLR5fT" name="activation_layer.hpp" compile="0" resource="0"
+                file="Source/fdeep/layers/activation_layer.hpp"/>
+          <FILE id="zSR1GY" name="add_layer.hpp" compile="0" resource="0" file="Source/fdeep/layers/add_layer.hpp"/>
+          <FILE id="XmpTl4" name="average_layer.hpp" compile="0" resource="0"
+                file="Source/fdeep/layers/average_layer.hpp"/>
+          <FILE id="UkK75P" name="average_pooling_2d_layer.hpp" compile="0" resource="0"
+                file="Source/fdeep/layers/average_pooling_2d_layer.hpp"/>
+          <FILE id="Qw1QdB" name="batch_normalization_layer.hpp" compile="0"
+                resource="0" file="Source/fdeep/layers/batch_normalization_layer.hpp"/>
+          <FILE id="qBqrgJ" name="bidirectional_layer.hpp" compile="0" resource="0"
+                file="Source/fdeep/layers/bidirectional_layer.hpp"/>
+          <FILE id="nWTUZT" name="concatenate_layer.hpp" compile="0" resource="0"
+                file="Source/fdeep/layers/concatenate_layer.hpp"/>
+          <FILE id="aGfyfU" name="conv_2d_layer.hpp" compile="0" resource="0"
+                file="Source/fdeep/layers/conv_2d_layer.hpp"/>
+          <FILE id="QJhm39" name="cropping_2d_layer.hpp" compile="0" resource="0"
+                file="Source/fdeep/layers/cropping_2d_layer.hpp"/>
+          <FILE id="louvLt" name="dense_layer.hpp" compile="0" resource="0" file="Source/fdeep/layers/dense_layer.hpp"/>
+          <FILE id="HAf9Ra" name="depthwise_conv_2d_layer.hpp" compile="0" resource="0"
+                file="Source/fdeep/layers/depthwise_conv_2d_layer.hpp"/>
+          <FILE id="ucSFJg" name="elu_layer.hpp" compile="0" resource="0" file="Source/fdeep/layers/elu_layer.hpp"/>
+          <FILE id="IImsvw" name="embedding_layer.hpp" compile="0" resource="0"
+                file="Source/fdeep/layers/embedding_layer.hpp"/>
+          <FILE id="QOsWXU" name="flatten_layer.hpp" compile="0" resource="0"
+                file="Source/fdeep/layers/flatten_layer.hpp"/>
+          <FILE id="gmjqWd" name="global_average_pooling_1d_layer.hpp" compile="0"
+                resource="0" file="Source/fdeep/layers/global_average_pooling_1d_layer.hpp"/>
+          <FILE id="TGRYbQ" name="global_average_pooling_2d_layer.hpp" compile="0"
+                resource="0" file="Source/fdeep/layers/global_average_pooling_2d_layer.hpp"/>
+          <FILE id="rgEMz8" name="global_max_pooling_1d_layer.hpp" compile="0"
+                resource="0" file="Source/fdeep/layers/global_max_pooling_1d_layer.hpp"/>
+          <FILE id="Fkv3px" name="global_max_pooling_2d_layer.hpp" compile="0"
+                resource="0" file="Source/fdeep/layers/global_max_pooling_2d_layer.hpp"/>
+          <FILE id="HsiKUZ" name="global_pooling_layer.hpp" compile="0" resource="0"
+                file="Source/fdeep/layers/global_pooling_layer.hpp"/>
+          <FILE id="nAMiQV" name="gru_layer.hpp" compile="0" resource="0" file="Source/fdeep/layers/gru_layer.hpp"/>
+          <FILE id="Gw5YEz" name="hard_sigmoid_layer.hpp" compile="0" resource="0"
+                file="Source/fdeep/layers/hard_sigmoid_layer.hpp"/>
+          <FILE id="ltR7ol" name="input_layer.hpp" compile="0" resource="0" file="Source/fdeep/layers/input_layer.hpp"/>
+          <FILE id="ptIQd4" name="layer.hpp" compile="0" resource="0" file="Source/fdeep/layers/layer.hpp"/>
+          <FILE id="dXdUot" name="leaky_relu_layer.hpp" compile="0" resource="0"
+                file="Source/fdeep/layers/leaky_relu_layer.hpp"/>
+          <FILE id="tB264v" name="linear_layer.hpp" compile="0" resource="0"
+                file="Source/fdeep/layers/linear_layer.hpp"/>
+          <FILE id="hDk1jP" name="lstm_layer.hpp" compile="0" resource="0" file="Source/fdeep/layers/lstm_layer.hpp"/>
+          <FILE id="hjNHlT" name="max_pooling_2d_layer.hpp" compile="0" resource="0"
+                file="Source/fdeep/layers/max_pooling_2d_layer.hpp"/>
+          <FILE id="Vt3ZeB" name="maximum_layer.hpp" compile="0" resource="0"
+                file="Source/fdeep/layers/maximum_layer.hpp"/>
+          <FILE id="II0AHZ" name="model_layer.hpp" compile="0" resource="0" file="Source/fdeep/layers/model_layer.hpp"/>
+          <FILE id="Qt6vY4" name="multiply_layer.hpp" compile="0" resource="0"
+                file="Source/fdeep/layers/multiply_layer.hpp"/>
+          <FILE id="htQISu" name="permute_layer.hpp" compile="0" resource="0"
+                file="Source/fdeep/layers/permute_layer.hpp"/>
+          <FILE id="Bbw2hh" name="pooling_2d_layer.hpp" compile="0" resource="0"
+                file="Source/fdeep/layers/pooling_2d_layer.hpp"/>
+          <FILE id="FJurfh" name="prelu_layer.hpp" compile="0" resource="0" file="Source/fdeep/layers/prelu_layer.hpp"/>
+          <FILE id="KeaQSe" name="relu_layer.hpp" compile="0" resource="0" file="Source/fdeep/layers/relu_layer.hpp"/>
+          <FILE id="LLRNnw" name="reshape_layer.hpp" compile="0" resource="0"
+                file="Source/fdeep/layers/reshape_layer.hpp"/>
+          <FILE id="YqD1E6" name="selu_layer.hpp" compile="0" resource="0" file="Source/fdeep/layers/selu_layer.hpp"/>
+          <FILE id="puHfmS" name="separable_conv_2d_layer.hpp" compile="0" resource="0"
+                file="Source/fdeep/layers/separable_conv_2d_layer.hpp"/>
+          <FILE id="IcZOpF" name="sigmoid_layer.hpp" compile="0" resource="0"
+                file="Source/fdeep/layers/sigmoid_layer.hpp"/>
+          <FILE id="BcC7mb" name="softmax_layer.hpp" compile="0" resource="0"
+                file="Source/fdeep/layers/softmax_layer.hpp"/>
+          <FILE id="loYzMk" name="softplus_layer.hpp" compile="0" resource="0"
+                file="Source/fdeep/layers/softplus_layer.hpp"/>
+          <FILE id="qXV4pH" name="subtract_layer.hpp" compile="0" resource="0"
+                file="Source/fdeep/layers/subtract_layer.hpp"/>
+          <FILE id="vMrfMH" name="tanh_layer.hpp" compile="0" resource="0" file="Source/fdeep/layers/tanh_layer.hpp"/>
+          <FILE id="nqyHQZ" name="time_distributed_layer.hpp" compile="0" resource="0"
+                file="Source/fdeep/layers/time_distributed_layer.hpp"/>
+          <FILE id="IOSz9r" name="upsampling_1d_layer.hpp" compile="0" resource="0"
+                file="Source/fdeep/layers/upsampling_1d_layer.hpp"/>
+          <FILE id="NPk8Xq" name="upsampling_2d_layer.hpp" compile="0" resource="0"
+                file="Source/fdeep/layers/upsampling_2d_layer.hpp"/>
+          <FILE id="rBi3uD" name="zero_padding_2d_layer.hpp" compile="0" resource="0"
+                file="Source/fdeep/layers/zero_padding_2d_layer.hpp"/>
+        </GROUP>
+        <FILE id="c8Towf" name="base64.hpp" compile="0" resource="0" file="Source/fdeep/base64.hpp"/>
+      </GROUP>
       <FILE id="yhmuuw" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="rJh728" name="PluginProcessor.h" compile="0" resource="0"

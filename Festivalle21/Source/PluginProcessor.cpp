@@ -8,6 +8,9 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "fdeep/fdeep.hpp"
+#include "fdeep/model.hpp"
+
 
 //==============================================================================
 Festivalle21AudioProcessor::Festivalle21AudioProcessor()
@@ -22,6 +25,8 @@ Festivalle21AudioProcessor::Festivalle21AudioProcessor()
                        )
 #endif
 {
+    const auto model = load_model("fdeep_model.json");
+    
     this->sampleRate = 0.0;
     this->samplesPerBlock = 0.0;
     // specify here where to send OSC messages to: host URL and UDP port number
