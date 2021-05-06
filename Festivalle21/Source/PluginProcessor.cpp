@@ -8,10 +8,8 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
-#include "fdeep/fdeep.hpp"
-#include "fdeep/model.hpp"
 
-
+using namespace std;
 //==============================================================================
 Festivalle21AudioProcessor::Festivalle21AudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -25,7 +23,9 @@ Festivalle21AudioProcessor::Festivalle21AudioProcessor()
                        )
 #endif
 {
-    const auto model = load_model("fdeep_model.json");
+    DBG("==============================================");
+    DBG(this->model.get_input_shapes().size());
+    DBG("==============================================");
     
     this->sampleRate = 0.0;
     this->samplesPerBlock = 0.0;
@@ -171,7 +171,7 @@ void Festivalle21AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     if (!sender.send("/juce/RMS", (float)buffer.getRMSLevel(0, 0, samplesPerBlock)))
         DBG("Error: could not send OSC message.");
     else {
-        DBG("SENT!");
+        //DBG("SENT!");
     }
 }
 

@@ -9,6 +9,8 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include <fdeep/fdeep.hpp>
+#include <string>
 
 //==============================================================================
 /**
@@ -57,6 +59,8 @@ private:
 
     double sampleRate;
     double samplesPerBlock;
+
+    fdeep::model model = fdeep::load_model("D:\\GitHub\\festivalle21\\Festivalle21\\Source\\models\\exported\\pred_model.json");
     
     juce::OSCSender sender;
     //==============================================================================
