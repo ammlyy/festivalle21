@@ -59,8 +59,8 @@ private:
 
     double sampleRate;
     double samplesPerBlock;
-
-    fdeep::model model = fdeep::load_model("D:\\GitHub\\festivalle21\\Festivalle21\\Source\\models\\exported\\pred_model.json");
+    //juce::String path = juce::File("D:\\GitHub\\festivalle21\\Festivalle21\\Source\\models\\exported\\fdeep_model.json").getRelativePathFrom(juce::File("./"));
+    fdeep::model model = fdeep::load_model("D:\\GitHub\\festivalle21\\Festivalle21\\Source\\models\\exported\\fdeep_model.json");
     
     juce::OSCSender sender;
     //==============================================================================
