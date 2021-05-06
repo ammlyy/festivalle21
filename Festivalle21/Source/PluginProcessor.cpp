@@ -9,6 +9,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+using namespace std;
 //==============================================================================
 Festivalle21AudioProcessor::Festivalle21AudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -22,6 +23,10 @@ Festivalle21AudioProcessor::Festivalle21AudioProcessor()
                        )
 #endif
 {
+    DBG("==============================================");
+    DBG(this->model.get_input_shapes().size());
+    DBG("==============================================");
+    
     this->sampleRate = 0.0;
     this->samplesPerBlock = 0.0;
     // specify here where to send OSC messages to: host URL and UDP port number
@@ -166,7 +171,7 @@ void Festivalle21AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     if (!sender.send("/juce/RMS", (float)buffer.getRMSLevel(0, 0, samplesPerBlock)))
         DBG("Error: could not send OSC message.");
     else {
-        DBG("SENT!");
+        //DBG("SENT!");
     }
 }
 
