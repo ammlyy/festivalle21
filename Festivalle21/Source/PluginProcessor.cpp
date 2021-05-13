@@ -10,6 +10,8 @@
 #include "PluginEditor.h"
 
 using namespace std;
+const float BUFFER_SIZE = 0.5; //500 ms
+
 //==============================================================================
 Festivalle21AudioProcessor::Festivalle21AudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -23,12 +25,13 @@ Festivalle21AudioProcessor::Festivalle21AudioProcessor()
                        )
 #endif
 {
-    DBG("==============================================");
+   /* DBG("==============================================");
     DBG(this->model.get_input_shapes().size());
-    DBG("==============================================");
+    DBG("==============================================");*/
     
     this->sampleRate = 0.0;
     this->samplesPerBlock = 0.0;
+    this->bufferToFillSampleIdx = 0;
     // specify here where to send OSC messages to: host URL and UDP port number
     if (!sender.connect("192.168.1.180", 9001))   // [4]
         DBG("Error: could not connect to UDP port 9001.");
@@ -107,6 +110,7 @@ void Festivalle21AudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     // initialisation that you need..
     this->sampleRate = sampleRate;
     this->samplesPerBlock = samplesPerBlock;
+    this->bufferToFill.setSize(1, sampleRate * BUFFER_SIZE);    // Setting the buffer channels to 1 and size to BUFFER_SIZE seconds
 }
 
 void Festivalle21AudioProcessor::releaseResources()
@@ -161,12 +165,28 @@ void Festivalle21AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     // the samples and the outer loop is handling the channels.
     // Alternatively, you can process the samples with the channels
     // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        auto* channelData = buffer.getWritePointer (channel);
 
-        // ..do something to the data...
+    for (int sample = 0; sample < buffer.getNumSamples(); sample++) 
+    {
+        auto monoSample = 0;
+
+        for (int channel = 0; channel < totalNumInputChannels; ++channel)
+        {
+            auto* inputChannelData = buffer.getReadPointer(channel);
+            monoSample += inputChannelData[sample];
+        }
+
+        monoSample /= 2;
+        this->bufferToFill.getWritePointer(0)[this->bufferToFillSampleIdx] = monoSample;
+
+        this->bufferToFillSampleIdx++;
+        if (this->bufferToFillSampleIdx == this->bufferToFill.getNumSamples())
+        {
+            this->bufferToFillSampleIdx = 0;
+            //this->predictAV(this->bufferToFill)     // Predict valence and arousal
+        }
     }
+
     // create and send an OSC message with an address and a float value:
     if (!sender.send("/juce/RMS", (float)buffer.getRMSLevel(0, 0, samplesPerBlock)))
         DBG("Error: could not send OSC message.");
