@@ -187,7 +187,7 @@ void Festivalle21AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
             this->bufferToFillSampleIdx = 0;
             if (this->test) {
                 this->predictAV(this->bufferToFill);     // Predict valence and arousal
-                this->test = !this->test;
+                this->test = false;
             }
         }
     }
@@ -234,9 +234,13 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 
 void Festivalle21AudioProcessor::predictAV(juce::AudioBuffer<float> buffer)
 {
+    auto input1 = fdeep::tensor(fdeep::tensor_shape(22050, 1), 42);
+    auto input2 = model.generate_dummy_inputs();
+    
+    DBG(fdeep::show_tensor_shape(input1.shape()));
+    DBG(fdeep::show_tensor_shape(input2[0].shape()));
     const auto result = model.predict({
-    fdeep::tensor(fdeep::tensor_shape(1, 22050, 1), 42),
-    fdeep::tensor(fdeep::tensor_shape(1, 22050, 1), 43)
+    input1
         });
     DBG(fdeep::show_tensors(result));
 }
