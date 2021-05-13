@@ -25,9 +25,11 @@ Festivalle21AudioProcessor::Festivalle21AudioProcessor()
                        )
 #endif
 {
-   /* DBG("==============================================");
-    DBG(this->model.get_input_shapes().size());
-    DBG("==============================================");*/
+    /*
+    DBG("==============================================");
+    DBG(this->path);
+    DBG("==============================================");
+    */
     
     this->sampleRate = 0.0;
     this->samplesPerBlock = 0.0;
@@ -176,7 +178,7 @@ void Festivalle21AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
             monoSample += inputChannelData[sample];
         }
 
-        monoSample /= 2;
+        monoSample /= totalNumInputChannels;
         this->bufferToFill.getWritePointer(0)[this->bufferToFillSampleIdx] = monoSample;
 
         this->bufferToFillSampleIdx++;
