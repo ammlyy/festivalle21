@@ -185,7 +185,10 @@ void Festivalle21AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         if (this->bufferToFillSampleIdx == this->bufferToFill.getNumSamples())
         {
             this->bufferToFillSampleIdx = 0;
-            //this->predictAV(this->bufferToFill)     // Predict valence and arousal
+            if (this->test) {
+                this->predictAV(this->bufferToFill);     // Predict valence and arousal
+                this->test = !this->test;
+            }
         }
     }
 
@@ -227,4 +230,13 @@ void Festivalle21AudioProcessor::setStateInformation (const void* data, int size
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new Festivalle21AudioProcessor();
+}
+
+void Festivalle21AudioProcessor::predictAV(juce::AudioBuffer<float> buffer)
+{
+    const auto result = model.predict({
+    fdeep::tensor(fdeep::tensor_shape(1, 22050, 1), 42),
+    fdeep::tensor(fdeep::tensor_shape(1, 22050, 1), 43)
+        });
+    DBG(fdeep::show_tensors(result));
 }

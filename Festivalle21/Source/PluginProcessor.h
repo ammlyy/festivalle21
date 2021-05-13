@@ -56,12 +56,16 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 private:
+
     double sampleRate;
     double samplesPerBlock;
-    fdeep::model model = fdeep::load_model("..\\..\\Source\\models\\exported\\fdeep_model.json");
+    fdeep::model model = fdeep::load_model("..\\..\\Source\\models\\exported\\pred_model.json");
     juce::AudioBuffer<float> bufferToFill;
     int bufferToFillSampleIdx;
     juce::OSCSender sender;
+
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Festivalle21AudioProcessor)
+    void predictAV(juce::AudioBuffer<float> buffer);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Festivalle21AudioProcessor)
+        bool test = true;
 };
