@@ -29,5 +29,4 @@ private:
     // access the processor object that created it.
     Festivalle21AudioProcessor& audioProcessor;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Festivalle21AudioProcessorEditor)
 };

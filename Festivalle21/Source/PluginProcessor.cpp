@@ -22,7 +22,7 @@ Festivalle21AudioProcessor::Festivalle21AudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ) 
 #endif
 {
     
@@ -166,7 +166,7 @@ void Festivalle21AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
 
     for (int sample = 0; sample < buffer.getNumSamples(); sample++) 
     {
-        auto monoSample = 0;
+        float monoSample = 0.0;
 
         for (int channel = 0; channel < totalNumInputChannels; ++channel)
         {
@@ -181,7 +181,7 @@ void Festivalle21AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         if (this->bufferToFillSampleIdx == this->bufferToFill.size())
         {
             this->bufferToFillSampleIdx = 0;
-            this->predictAV(this->bufferToFill);     // Predict valence and arousal
+            this->predictAV(this->bufferToFill);
         }
     }
 
@@ -231,9 +231,7 @@ void Festivalle21AudioProcessor::predictAV(std::vector<float> buffer)
     // create and send an OSC message with an address and a float value:
     if (!sender.send("/juce/AV", juce::OSCArgument(fdeep::show_tensors(result))))
         DBG("Error: could not send OSC message.");
-    else {
-        DBG("SENT!");
-    }
+   
     //DBG(fdeep::show_tensors(result));
     
 }

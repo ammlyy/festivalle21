@@ -12,7 +12,7 @@
 #include <fdeep/fdeep.hpp>
 #include <string>
 
-//#define PATH_TO_JSON = "D:\\GitHub\\festivalle21\\Festivalle21\\Source\\models\\exported\\pred_model.json"
+//#define PATH_TO_JSON = "D:\\GitHub\\festivalle21\\Festivalle21\\Source\\models\\exported\\pred_model.json";
 
 //==============================================================================
 /**
@@ -61,12 +61,11 @@ private:
 
     double sampleRate;
     double samplesPerBlock;
-    fdeep::model model = fdeep::load_model("D:\\GitHub\\festivalle21\\Festivalle21\\Source\\models\\exported\\pred_model.json");
+    fdeep::model model = fdeep::load_model("C:\\Users\\amere\\source\\Repos\\festivalle21\\Festivalle21\\Source\\models\\exported\\pred_model.json");
     std::vector<float> bufferToFill;
     int bufferToFillSampleIdx;
     juce::OSCSender sender;
 
     //==============================================================================
     void predictAV(std::vector<float> buffer);
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Festivalle21AudioProcessor)
 };
