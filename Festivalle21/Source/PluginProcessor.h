@@ -12,6 +12,8 @@
 #include <fdeep/fdeep.hpp>
 #include <string>
 
+const string PATH_TO_JSON = ''
+
 //==============================================================================
 /**
 */
@@ -59,13 +61,12 @@ private:
 
     double sampleRate;
     double samplesPerBlock;
-    fdeep::model model = fdeep::load_model("..\\..\\Source\\models\\exported\\pred_model.json");
-    juce::AudioBuffer<float> bufferToFill;
+    fdeep::model model = fdeep::load_model(PATH_TO_JSON);
+    std::vector<float> bufferToFill;
     int bufferToFillSampleIdx;
     juce::OSCSender sender;
 
     //==============================================================================
-    void predictAV(juce::AudioBuffer<float> buffer);
+    void predictAV(std::vector<float> buffer);
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Festivalle21AudioProcessor)
-        bool test = true;
 };

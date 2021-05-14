@@ -25,18 +25,13 @@ Festivalle21AudioProcessor::Festivalle21AudioProcessor()
                        )
 #endif
 {
-    /*
-    DBG("==============================================");
-    DBG(this->path);
-    DBG("==============================================");
-    */
     
     this->sampleRate = 0.0;
     this->samplesPerBlock = 0.0;
     this->bufferToFillSampleIdx = 0;
     // specify here where to send OSC messages to: host URL and UDP port number
-    if (!sender.connect("192.168.1.180", 9001))   // [4]
-        DBG("Error: could not connect to UDP port 9001.");
+    /*if (!sender.connect("192.168.1.180", 9001))   // [4]
+        DBG("Error: could not connect to UDP port 9001."); */
 }
 
 Festivalle21AudioProcessor::~Festivalle21AudioProcessor()
@@ -112,7 +107,7 @@ void Festivalle21AudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     // initialisation that you need..
     this->sampleRate = sampleRate;
     this->samplesPerBlock = samplesPerBlock;
-    this->bufferToFill.setSize(1, sampleRate * BUFFER_SIZE);    // Setting the buffer channels to 1 and size to BUFFER_SIZE seconds
+    this->bufferToFill.resize(sampleRate * BUFFER_SIZE); // Initiliase the array to contain 500ms
 }
 
 void Festivalle21AudioProcessor::releaseResources()
@@ -179,25 +174,24 @@ void Festivalle21AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         }
 
         monoSample /= totalNumInputChannels;
-        this->bufferToFill.getWritePointer(0)[this->bufferToFillSampleIdx] = monoSample;
+        this->bufferToFill[this->bufferToFillSampleIdx] = monoSample;
 
         this->bufferToFillSampleIdx++;
-        if (this->bufferToFillSampleIdx == this->bufferToFill.getNumSamples())
+        if (this->bufferToFillSampleIdx == this->bufferToFill.size())
         {
             this->bufferToFillSampleIdx = 0;
-            if (this->test) {
-                this->predictAV(this->bufferToFill);     // Predict valence and arousal
-                this->test = false;
-            }
+            this->predictAV(this->bufferToFill);     // Predict valence and arousal
         }
     }
 
-    // create and send an OSC message with an address and a float value:
+  /*  // create and send an OSC message with an address and a float value:
     if (!sender.send("/juce/RMS", (float)buffer.getRMSLevel(0, 0, samplesPerBlock)))
-        DBG("Error: could not send OSC message.");
+        //DBG("Error: could not send OSC message.");
     else {
-        //DBG("SENT!");
+        DBG("SENT!");
     }
+    */
+   
 }
 
 //==============================================================================
@@ -232,15 +226,14 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
     return new Festivalle21AudioProcessor();
 }
 
-void Festivalle21AudioProcessor::predictAV(juce::AudioBuffer<float> buffer)
+void Festivalle21AudioProcessor::predictAV(std::vector<float> buffer)
 {
-    auto input1 = fdeep::tensor(fdeep::tensor_shape(22050, 1), 42);
-    auto input2 = model.generate_dummy_inputs();
+    const fdeep::tensor input(fdeep::tensor_shape(22050, 1), buffer);
     
-    DBG(fdeep::show_tensor_shape(input1.shape()));
-    DBG(fdeep::show_tensor_shape(input2[0].shape()));
+    //DBG(fdeep::show_tensor_shape(input.shape()));
     const auto result = model.predict({
-    input1
+    input
         });
-    DBG(fdeep::show_tensors(result));
+    //DBG(fdeep::show_tensors(result));
+    
 }
