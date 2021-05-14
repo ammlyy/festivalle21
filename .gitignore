@@ -6,3 +6,5 @@ py/venv
 .vs
 py/frugally-deep
 py/.vscode
+venv
+.idea

@@ -30,8 +30,8 @@ Festivalle21AudioProcessor::Festivalle21AudioProcessor()
     this->samplesPerBlock = 0.0;
     this->bufferToFillSampleIdx = 0;
     // specify here where to send OSC messages to: host URL and UDP port number
-    /*if (!sender.connect("192.168.1.180", 9001))   // [4]
-        DBG("Error: could not connect to UDP port 9001."); */
+    if (!sender.connect("127.0.0.1", 5005))   // [4]
+        DBG("Error: could not connect to UDP port 9001."); 
 }
 
 Festivalle21AudioProcessor::~Festivalle21AudioProcessor()
@@ -185,13 +185,6 @@ void Festivalle21AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         }
     }
 
-  /*  // create and send an OSC message with an address and a float value:
-    if (!sender.send("/juce/RMS", (float)buffer.getRMSLevel(0, 0, samplesPerBlock)))
-        //DBG("Error: could not send OSC message.");
-    else {
-        DBG("SENT!");
-    }
-    */
    
 }
 
@@ -232,9 +225,15 @@ void Festivalle21AudioProcessor::predictAV(std::vector<float> buffer)
     const fdeep::tensor input(fdeep::tensor_shape(22050, 1), buffer);
     
     //DBG(fdeep::show_tensor_shape(input.shape()));
-    const auto result = model.predict({
+    const fdeep::tensors result = model.predict({
     input
         });
+    // create and send an OSC message with an address and a float value:
+    if (!sender.send("/juce/AV", juce::OSCArgument(fdeep::show_tensors(result))))
+        DBG("Error: could not send OSC message.");
+    else {
+        DBG("SENT!");
+    }
     //DBG(fdeep::show_tensors(result));
     
 }
