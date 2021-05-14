@@ -12,7 +12,7 @@
 #include <fdeep/fdeep.hpp>
 #include <string>
 
-const string PATH_TO_JSON = ''
+//#define PATH_TO_JSON = "D:\\GitHub\\festivalle21\\Festivalle21\\Source\\models\\exported\\pred_model.json"
 
 //==============================================================================
 /**
@@ -61,7 +61,7 @@ private:
 
     double sampleRate;
     double samplesPerBlock;
-    fdeep::model model = fdeep::load_model(PATH_TO_JSON);
+    fdeep::model model = fdeep::load_model("D:\\GitHub\\festivalle21\\Festivalle21\\Source\\models\\exported\\pred_model.json");
     std::vector<float> bufferToFill;
     int bufferToFillSampleIdx;
     juce::OSCSender sender;

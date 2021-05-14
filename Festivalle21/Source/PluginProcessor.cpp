@@ -107,7 +107,8 @@ void Festivalle21AudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     // initialisation that you need..
     this->sampleRate = sampleRate;
     this->samplesPerBlock = samplesPerBlock;
-    this->bufferToFill.resize(sampleRate * BUFFER_SIZE); // Initiliase the array to contain 500ms
+    //this->bufferToFill.resize(sampleRate * BUFFER_SIZE); // Initiliase the array to contain 500ms
+    this->bufferToFill.resize(22050); // Initiliase the array to contain 500ms
 }
 
 void Festivalle21AudioProcessor::releaseResources()
