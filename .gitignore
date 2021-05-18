@@ -8,3 +8,4 @@ py/frugally-deep
 py/.vscode
 venv
 .idea
+py/notebook

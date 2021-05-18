@@ -61,7 +61,8 @@ private:
 
     double sampleRate;
     double samplesPerBlock;
-    fdeep::model model = fdeep::load_model("C:\\Users\\amere\\source\\Repos\\festivalle21\\Festivalle21\\Source\\models\\exported\\pred_model.json");
+
+    fdeep::model model = fdeep::load_model("C:\\Users\\amere\\source\\Repos\\festivalle21\\Festivalle21\\Source\\models\\exported\\td_modelNone.json");
     std::vector<float> bufferToFill;
     int bufferToFillSampleIdx;
     juce::OSCSender sender;
