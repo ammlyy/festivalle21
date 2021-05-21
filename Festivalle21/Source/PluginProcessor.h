@@ -56,12 +56,13 @@ public:
     //==============================================================================
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+    std::vector<float> getAV();
 
 private:
 
     double sampleRate;
     double samplesPerBlock;
-
+    std::vector<float> av;
     fdeep::model model = fdeep::load_model("C:\\Users\\amere\\source\\Repos\\festivalle21\\Festivalle21\\Source\\models\\exported\\td_modelNone.json");
     std::vector<float> bufferToFill;
     int bufferToFillSampleIdx;

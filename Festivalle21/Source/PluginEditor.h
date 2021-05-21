@@ -14,7 +14,7 @@
 //==============================================================================
 /**
 */
-class Festivalle21AudioProcessorEditor  : public juce::AudioProcessorEditor
+class Festivalle21AudioProcessorEditor  : public juce::AudioProcessorEditor, public juce::Timer
 {
 public:
     Festivalle21AudioProcessorEditor (Festivalle21AudioProcessor&);
@@ -23,10 +23,12 @@ public:
     //==============================================================================
     void paint (juce::Graphics&) override;
     void resized() override;
+    void timerCallback() override;
 
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     Festivalle21AudioProcessor& audioProcessor;
+    void drawPoint(juce::Graphics& g);
 
 };
