@@ -1,5 +1,4 @@
 
-
 """Small example OSC client
 
 This program sends 10 random values between 0.0 and 1.0 to the /filter address,
@@ -21,8 +20,9 @@ if __name__ == "__main__":
   args = parser.parse_args()
 
   client = udp_client.SimpleUDPClient(args.ip, args.port)
-
-  for x in range(30):
-    client.send_message("/filter", random.random())
-    print("Sent!!")
-    time.sleep(1)
+  scena = 0
+  while True:
+    client.send_message("/scena/" + str(scena), 0.5)
+    print("Sent on scena/" + str(scena))
+    scena = (scena + 1) % 4
+    time.sleep(0.2)
