@@ -28,11 +28,13 @@ Festivalle21AudioProcessor::Festivalle21AudioProcessor()
     this->sampleRate = 0.0;
     this->samplesPerBlock = 0.0;
     this->bufferToFillSampleIdx = 0;
+    this->av = std::vector<std::vector<float>>(COLOR_FREQUENCY, std::vector<float>(2,0));
+    this->currentAVindex = 0;
+
     // specify here where to send OSC messages to: host URL and UDP port number
     if (!sender.connect("127.0.0.1", 5005))   // [4]
         DBG("Error: could not connect to UDP port 5005."); 
 
-    this->av = std::vector<float>(2);
 
     
 }
@@ -218,7 +220,7 @@ void Festivalle21AudioProcessor::setStateInformation (const void* data, int size
 
 std::vector<float> Festivalle21AudioProcessor::getAV()
 {
-    return this->av;
+    return this->av[0];
 }
 
 //==============================================================================
@@ -237,13 +239,42 @@ void Festivalle21AudioProcessor::predictAV(std::vector<float> buffer)
         input
             });
 
-        this->av = result[0].to_vector();
-        // create and send an OSC message with an address and a float value:
-        if (!sender.send("/juce/AV", juce::OSCArgument(this->av[0]), juce::OSCArgument(this->av[1])))
-            DBG("Error: could not send OSC message.");
-        else {
-            //DBG("SENT!" + to_string(this->av[0]) + ' ' + to_string(this->av[1]));
+        this->av.at(currentAVindex) = (result[0].to_vector());
+        this->currentAVindex++;
+        if (this->currentAVindex == COLOR_FREQUENCY) {
+            std::vector<float> msg;
+            msg = this->getRGBValue(this->av);
+            // create and send an OSC message with an address and a float value:
+            if (!sender.send("/juce/RGB", juce::OSCArgument(msg[0]), juce::OSCArgument(msg[1]), juce::OSCArgument(msg[2])))
+                this->av.clear();
+
+            this->currentAVindex = 0;
         }
-        //DBG(fdeep::show_tensors(result));
         
+}
+
+ std::vector<float> Festivalle21AudioProcessor::getRGBValue(std::vector<std::vector<float>> av)
+{
+     float avg_valence = 0.0f;
+     float avg_arousal = 0.0f;
+     float tmp = 0.0f;
+     for (int i = 0; i < COLOR_FREQUENCY; i++) {
+         avg_valence += av[i][0];
+         avg_arousal += av[i][1];
+     }
+     avg_valence /= av.size();
+     avg_arousal /= av.size();
+
+     float angle = atan(avg_valence / avg_arousal);
+     float distance = sqrt(pow(avg_valence, 2) * pow(avg_arousal, 2)) * 255.0f;
+
+
+     float R = distance * cos(angle);
+     float G = distance * cos(angle + 120);
+     float B = distance * cos(angle - 120);
+     DBG(R);
+     DBG(G);
+     DBG(B);
+
+     return { R,G,B };
 }
