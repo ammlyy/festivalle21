@@ -1,3 +1,4 @@
+
 """Small example OSC client
 
 This program sends 10 random values between 0.0 and 1.0 to the /filter address,
@@ -9,20 +10,19 @@ import time
 
 from pythonosc import udp_client
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--ip", default="127.0.0.1",
-                        help="The ip of the OSC server")
-    parser.add_argument("--port", type=int, default=8090,
-                        help="The port the OSC server is listening on")
-    args = parser.parse_args()
-    aclient = udp_client.SimpleUDPClient(args.ip, args.port)
 
-    while True:
-        V = random.random()
-        A = random.random()
-        client.send_message("/juce/V", V)
-        client.send_message("/juce/A", A)
-        print(V, A)
-        print("Sending on {}".format(client))
-        time.sleep(1)
+if __name__ == "__main__":
+  parser = argparse.ArgumentParser()
+  parser.add_argument("--ip", default="127.0.0.1",
+      help="The ip of the OSC server")
+  parser.add_argument("--port", type=int, default=5005,
+      help="The port the OSC server is listening on")
+  args = parser.parse_args()
+
+  client = udp_client.SimpleUDPClient(args.ip, args.port)
+  scena = 0
+  while True:
+    client.send_message("/scena/" + str(scena), 0.5)
+    print("Sent on scena/" + str(scena))
+    scena = (scena + 1) % 4
+    time.sleep(0.2)

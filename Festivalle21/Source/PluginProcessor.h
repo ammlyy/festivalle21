@@ -12,7 +12,10 @@
 #include <fdeep/fdeep.hpp>
 #include <string>
 
-//#define PATH_TO_JSON = "D:\\GitHub\\festivalle21\\Festivalle21\\Source\\models\\exported\\pred_model.json"
+#define COLOR_FREQUENCY 6 // number of 500ms windows analyzed before sending a color change (3seconds)
+#define SCENE_SELECTOR 20 // number of 500ms windows analyzed before sending a Scene triger (10seconds)
+
+//#define PATH_TO_JSON = "D:\\GitHub\\festivalle21\\Festivalle21\\Source\\models\\exported\\pred_model.json";
 
 //==============================================================================
 /**
@@ -56,17 +59,21 @@ public:
     //==============================================================================
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+    std::vector<float> getAV();
 
 private:
 
     double sampleRate;
     double samplesPerBlock;
-    fdeep::model model = fdeep::load_model("D:\\GitHub\\festivalle21\\Festivalle21\\Source\\models\\exported\\pred_model.json");
+    std::vector<std::vector<float>> av;
+    int currentAVindex;
+    fdeep::model model = fdeep::load_model("C:\\Users\\amere\\source\\Repos\\festivalle21\\Festivalle21\\Source\\models\\exported\\td_modelNone.json");
     std::vector<float> bufferToFill;
     int bufferToFillSampleIdx;
     juce::OSCSender sender;
+    std::vector<float> getRGBValue(std::vector<std::vector<float>>);
+
 
     //==============================================================================
     void predictAV(std::vector<float> buffer);
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Festivalle21AudioProcessor)
 };

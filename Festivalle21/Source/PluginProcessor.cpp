@@ -22,16 +22,21 @@ Festivalle21AudioProcessor::Festivalle21AudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ) 
 #endif
 {
-    
     this->sampleRate = 0.0;
     this->samplesPerBlock = 0.0;
     this->bufferToFillSampleIdx = 0;
+    this->av = std::vector<std::vector<float>>(COLOR_FREQUENCY, std::vector<float>(2,0));
+    this->currentAVindex = 0;
+
     // specify here where to send OSC messages to: host URL and UDP port number
     if (!sender.connect("127.0.0.1", 5005))   // [4]
-        DBG("Error: could not connect to UDP port 9001."); 
+        DBG("Error: could not connect to UDP port 5005."); 
+
+
+    
 }
 
 Festivalle21AudioProcessor::~Festivalle21AudioProcessor()
@@ -166,7 +171,7 @@ void Festivalle21AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
 
     for (int sample = 0; sample < buffer.getNumSamples(); sample++) 
     {
-        auto monoSample = 0;
+        float monoSample = 0.0;
 
         for (int channel = 0; channel < totalNumInputChannels; ++channel)
         {
@@ -181,7 +186,7 @@ void Festivalle21AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         if (this->bufferToFillSampleIdx == this->bufferToFill.size())
         {
             this->bufferToFillSampleIdx = 0;
-            this->predictAV(this->bufferToFill);     // Predict valence and arousal
+            this->predictAV(this->bufferToFill);
         }
     }
 
@@ -213,6 +218,11 @@ void Festivalle21AudioProcessor::setStateInformation (const void* data, int size
     // whose contents will have been created by the getStateInformation() call.
 }
 
+std::vector<float> Festivalle21AudioProcessor::getAV()
+{
+    return this->av[0];
+}
+
 //==============================================================================
 // This creates new instances of the plugin..
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
@@ -222,18 +232,49 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 
 void Festivalle21AudioProcessor::predictAV(std::vector<float> buffer)
 {
-    const fdeep::tensor input(fdeep::tensor_shape(22050, 1), buffer);
-    
-    //DBG(fdeep::show_tensor_shape(input.shape()));
-    const fdeep::tensors result = model.predict({
-    input
-        });
-    // create and send an OSC message with an address and a float value:
-    if (!sender.send("/juce/AV", juce::OSCArgument(fdeep::show_tensors(result))))
-        DBG("Error: could not send OSC message.");
-    else {
-        DBG("SENT!");
-    }
-    //DBG(fdeep::show_tensors(result));
-    
+        const fdeep::tensor input(fdeep::tensor_shape(1,22050, 1), buffer);
+
+        //DBG(fdeep::show_tensor_shape(input.shape()));
+        const fdeep::tensors result = model.predict({
+        input
+            });
+
+        this->av.at(currentAVindex) = (result[0].to_vector());
+        this->currentAVindex++;
+        if (this->currentAVindex == COLOR_FREQUENCY) {
+            std::vector<float> msg;
+            msg = this->getRGBValue(this->av);
+            // create and send an OSC message with an address and a float value:
+            if (!sender.send("/juce/RGB", juce::OSCArgument(msg[0]), juce::OSCArgument(msg[1]), juce::OSCArgument(msg[2])))
+                this->av.clear();
+
+            this->currentAVindex = 0;
+        }
+        
+}
+
+ std::vector<float> Festivalle21AudioProcessor::getRGBValue(std::vector<std::vector<float>> av)
+{
+     float avg_valence = 0.0f;
+     float avg_arousal = 0.0f;
+     float tmp = 0.0f;
+     for (int i = 0; i < COLOR_FREQUENCY; i++) {
+         avg_valence += av[i][0];
+         avg_arousal += av[i][1];
+     }
+     avg_valence /= av.size();
+     avg_arousal /= av.size();
+
+     float angle = atan(avg_valence / avg_arousal);
+     float distance = sqrt(pow(avg_valence, 2) * pow(avg_arousal, 2)) * 255.0f;
+
+
+     float R = distance * cos(angle);
+     float G = distance * cos(angle + 120);
+     float B = distance * cos(angle - 120);
+     DBG(R);
+     DBG(G);
+     DBG(B);
+
+     return { R,G,B };
 }
