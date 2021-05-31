@@ -6,5 +6,7 @@ py/venv
 .vs
 py/frugally-deep
 py/.vscode
+py/notebook/audiofiles
+py/notebook/labelled_data
 venv
 .idea
