@@ -10,3 +10,4 @@ py/notebook/audiofiles
 py/notebook/labelled_data
 venv
 .idea
+py/notebook
