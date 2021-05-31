@@ -12,6 +12,8 @@
 #include <fdeep/fdeep.hpp>
 #include <string>
 
+#define PI 3.14159265
+
 #define COLOR_FREQUENCY 6 // number of 500ms windows analyzed before sending a color change (3seconds)
 #define SCENE_SELECTOR 20 // number of 500ms windows analyzed before sending a Scene triger (10seconds)
 
@@ -67,7 +69,7 @@ private:
     double samplesPerBlock;
     std::vector<std::vector<float>> av;
     int currentAVindex;
-    fdeep::model model = fdeep::load_model("C:\\Users\\amere\\source\\Repos\\festivalle21\\Festivalle21\\Source\\models\\exported\\td_modelNone.json");
+    fdeep::model model = fdeep::load_model("D:\\GitHub\\festivalle21\\Festivalle21\\Source\\models\\exported\\td_modelNone.json");
     std::vector<float> bufferToFill;
     int bufferToFillSampleIdx;
     juce::OSCSender sender;

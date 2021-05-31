@@ -253,28 +253,69 @@ void Festivalle21AudioProcessor::predictAV(std::vector<float> buffer)
         
 }
 
- std::vector<float> Festivalle21AudioProcessor::getRGBValue(std::vector<std::vector<float>> av)
+std::vector<float> Festivalle21AudioProcessor::getRGBValue(std::vector<std::vector<float>> av)
 {
-     float avg_valence = 0.0f;
-     float avg_arousal = 0.0f;
-     float tmp = 0.0f;
-     for (int i = 0; i < COLOR_FREQUENCY; i++) {
-         avg_valence += av[i][0];
-         avg_arousal += av[i][1];
-     }
-     avg_valence /= av.size();
-     avg_arousal /= av.size();
+    float avg_valence = 0.0f;
+    float avg_arousal = 0.0f;
+    float tmp = 0.0f;
 
-     float angle = atan(avg_valence / avg_arousal);
-     float distance = sqrt(pow(avg_valence, 2) * pow(avg_arousal, 2)) * 255.0f;
+    float R = 0;
+    float G = 0;
+    float B = 0;
 
+    for (int i = 0; i < COLOR_FREQUENCY; i++) {
+        avg_valence += av[i][0];
+        avg_arousal += av[i][1];
+    }
+    avg_valence /= av.size();
+    avg_arousal /= av.size();
 
-     float R = distance * cos(angle);
-     float G = distance * cos(angle + 120);
-     float B = distance * cos(angle - 120);
-     DBG(R);
-     DBG(G);
-     DBG(B);
+    float H = atan2(avg_arousal, avg_valence) * 180.0 / PI;    // Hue
+    float S = std::min(sqrt(pow(avg_valence, 2) * pow(avg_arousal, 2)), 1.0);    // Saturation (distance)
+    float V = 1.0;  //Intensity
 
-     return { R,G,B };
+    float C = V * S;
+    float X = C * (1 - std::abs(std::fmod((H / 60.0), 2.0) - 1.0));
+    float m = V - C;
+
+    if (H >= 0 && H < 60) {
+        R = C;
+        G = X;
+        B = 0;
+    }
+    else if (H >= 60 && H < 120) {
+        R = X;
+        G = C;
+        B = 0;
+    }
+    else if (H >= 120 && H < 180) {
+        R = 0;
+        G = C;
+        B = X;
+    }
+    else if (H >= 180 && H < 240) {
+        R = 0;
+        G = X;
+        B = C;
+    }
+    else if (H >= 240 && H < 300) {
+        R = X;
+        G = 0;
+        B = C;
+    }
+    else if (H >= 300 && H < 360) {
+        R = C;
+        G = 0;
+        B = X;
+    }
+
+    R = (R + m) * 255;
+    G = (G + m) * 255;
+    B = (B + m) * 255;
+
+    DBG(R);
+    DBG(G);
+    DBG(B);
+
+    return { R,G,B };
 }
