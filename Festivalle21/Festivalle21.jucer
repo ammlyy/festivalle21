@@ -8,11 +8,9 @@
     <GROUP id="{8919C6B9-B79B-DB30-D6F5-6F616A95C221}" name="Source">
       <GROUP id="{CFB456C6-DE13-4941-AC49-CB2725A3B2BC}" name="models">
         <GROUP id="{DF4530AE-42E0-6652-94F2-B0DB34D6719E}" name="exported">
-          <FILE id="j7s5aW" name="td_modelNone.json" compile="0" resource="1"
-                file="Source/models/exported/td_modelNone.json"/>
-          <FILE id="AhhllY" name="pred_model.json" compile="0" resource="1" file="Source/models/exported/pred_model.json"/>
+          <FILE id="vhbrqc" name="exported_model.json" compile="0" resource="1"
+                file="Source/models/exported/exported_model.json"/>
         </GROUP>
-        <FILE id="eTwPYV" name="pred_model.h5" compile="0" resource="1" file="Source/models/pred_model.h5"/>
       </GROUP>
       <FILE id="yhmuuw" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>

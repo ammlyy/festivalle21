@@ -83,7 +83,7 @@ void Festivalle21AudioProcessorEditor::drawPoint(juce::Graphics& g)
 
 
 
-    g.drawEllipse(centre.x + av[1] * 1000.f, centre.y - av[0] * 1000.f, 5.f, 5.f, 3.f);
+    g.drawEllipse(centre.x + av[1] * diameter, centre.y - av[0] * diameter, 5.f, 5.f, 3.f);
 
 
 }

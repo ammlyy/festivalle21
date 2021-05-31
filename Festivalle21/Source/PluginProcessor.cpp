@@ -232,7 +232,7 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 
 void Festivalle21AudioProcessor::predictAV(std::vector<float> buffer)
 {
-        const fdeep::tensor input(fdeep::tensor_shape(1,22050, 1), buffer);
+        const fdeep::tensor input(fdeep::tensor_shape(22050, 1), buffer);
 
         //DBG(fdeep::show_tensor_shape(input.shape()));
         const fdeep::tensors result = model.predict({
@@ -257,7 +257,6 @@ std::vector<float> Festivalle21AudioProcessor::getRGBValue(std::vector<std::vect
 {
     float avg_valence = 0.0f;
     float avg_arousal = 0.0f;
-    float tmp = 0.0f;
 
     float R = 0;
     float G = 0;
