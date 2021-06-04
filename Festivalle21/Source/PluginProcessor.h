@@ -17,7 +17,7 @@
 
 #define COLOR_FREQUENCY 6 // number of 500ms windows analyzed before sending a color change (3seconds)
 #define SCENE_SELECTOR 20 // number of 500ms windows analyzed before sending a Scene triger (10seconds)
-//#define MEASURE_TIME 0
+#define MEASURE_TIME 0  // comment this line not to measure prediction time
 
 //#define PATH_TO_JSON = "D:\\GitHub\\festivalle21\\Festivalle21\\Source\\models\\exported\\pred_model.json";
 
