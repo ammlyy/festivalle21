@@ -24,6 +24,10 @@ Festivalle21AudioProcessor::Festivalle21AudioProcessor()
                        ) 
 #endif
 {
+    #ifdef MEASURE_TIME
+        this->myfile.open("timing_measure.txt");
+    #endif
+
     this->sampleRate = 0.0;
     this->samplesPerBlock = 0.0;
     this->bufferToFillSampleIdx = 0;
@@ -42,6 +46,9 @@ Festivalle21AudioProcessor::Festivalle21AudioProcessor()
 
 Festivalle21AudioProcessor::~Festivalle21AudioProcessor()
 {
+    #ifdef MEASURE_TIME
+        this->myfile.close();
+    #endif
 }
 
 //==============================================================================
@@ -188,7 +195,30 @@ void Festivalle21AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         {
             this->bufferToFillSampleIdx = 0;
 
+            #ifdef MEASURE_TIME
+            using std::chrono::high_resolution_clock;
+            using std::chrono::duration_cast;
+            using std::chrono::duration;
+            using std::chrono::milliseconds;
+
+            auto t1 = high_resolution_clock::now();
+            #endif
+
             this->av.at(currentAVindex) = this->predictAV(this->bufferToFill);
+
+            #ifdef MEASURE_TIME
+            auto t2 = high_resolution_clock::now();
+
+            /* Getting number of milliseconds as an integer. */
+            auto ms_int = duration_cast<milliseconds>(t2 - t1);
+
+            /* Getting number of milliseconds as a double. */
+            duration<double, std::milli> ms_double = t2 - t1;
+            this->myfile << to_string(ms_double.count());
+            this->myfile << "\n";
+            DBG(ms_double.count());
+            #endif
+
             this->rms = this->bufferToFill.getRMSLevel(0, 0, BUFFER_SIZE);
 
             sender.send("/juce/RMS", juce::OSCArgument(this->rms));
