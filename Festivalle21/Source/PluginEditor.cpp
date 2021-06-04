@@ -15,7 +15,7 @@ Festivalle21AudioProcessorEditor::Festivalle21AudioProcessorEditor (Festivalle21
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     setSize (400, 300);
-    this->startTimerHz(30);
+    this->startTimerHz(60);
 }
 
 Festivalle21AudioProcessorEditor::~Festivalle21AudioProcessorEditor()
@@ -38,7 +38,7 @@ void Festivalle21AudioProcessorEditor::paint (juce::Graphics& g)
     juce::Point<float> left((getWidth() - diameter) * 0.5, getHeight() / 2.0);
     juce::Point<float> right((getWidth() + diameter) * 0.5, getHeight() / 2.0);
 
-  
+  /*
     //TOP
     const auto centre = getLocalBounds().toFloat().getCentre();
     const auto pi = juce::MathConstants<float>::pi;
@@ -55,6 +55,7 @@ void Festivalle21AudioProcessorEditor::paint (juce::Graphics& g)
     float thickness = diameter/3.0 + 5;
     p.addCentredArc(centre.x, centre.y, (diameter- thickness) * 0.5f, (diameter - thickness) * 0.5f, 0.f, -pi, pi, true);
     g.strokePath(p, juce::PathStrokeType(thickness));
+   */
 
     g.setColour(juce::Colours::white);
     g.setOpacity(0.3);
@@ -80,8 +81,6 @@ void Festivalle21AudioProcessorEditor::drawPoint(juce::Graphics& g)
     const auto av = this->audioProcessor.getAV();
     const auto centre = getLocalBounds().toFloat().getCentre();
     float radius = getWidth() / 4.0;
-
-
 
     g.drawEllipse(centre.x + av[1] * radius, centre.y - av[0] * radius, 5.f, 5.f, 3.f);
 

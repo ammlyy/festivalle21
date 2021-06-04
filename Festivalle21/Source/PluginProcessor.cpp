@@ -33,7 +33,7 @@ Festivalle21AudioProcessor::Festivalle21AudioProcessor()
     this->currentAVindex = 0;
 
     // specify here where to send OSC messages to: host URL and UDP port number
-    if (!sender.connect("127.0.0.1", 5005))   // [4]
+    if (!sender.connect("192.168.1.9", 5005))   // [4]
         DBG("Error: could not connect to UDP port 5005."); 
 
 
@@ -237,7 +237,7 @@ void Festivalle21AudioProcessor::setStateInformation (const void* data, int size
 
 std::vector<float> Festivalle21AudioProcessor::getAV()
 {
-    return this->av[0];
+    return this->av.at(0);
 }
 
 //==============================================================================
@@ -262,18 +262,21 @@ std::vector<float> Festivalle21AudioProcessor::getRGBValue(std::vector<std::vect
     float avg_valence = 0.0f;
     float avg_arousal = 0.0f;
 
-    float R = 0;
-    float G = 0;
-    float B = 0;
+    float R = 0.0f;
+    float G = 0.0f;
+    float B = 0.0f;
 
     for (int i = 0; i < COLOR_FREQUENCY; i++) {
-        avg_valence += av[i][0];
-        avg_arousal += av[i][1];
+        avg_valence += av[i][1];
+        avg_arousal += av[i][0];
     }
     avg_valence /= av.size();
     avg_arousal /= av.size();
 
-    float H = atan2(avg_arousal, avg_valence) * 180.0 / PI;    // Hue
+    float H = (atan2(avg_arousal, avg_valence) * 180.0 / PI );    // Hue
+    if (H < 0) {
+        H = 360.0 + H;
+    }
     float S = std::min(sqrt(pow(avg_valence, 2) + pow(avg_arousal, 2)), 1.0);    // Saturation (distance)
     float V = 1.0;  //Intensity
 
@@ -306,11 +309,13 @@ std::vector<float> Festivalle21AudioProcessor::getRGBValue(std::vector<std::vect
         G = 0;
         B = C;
     }
-    else if (H >= 300 && H < 360) {
+    else if (H >= 300 && H <= 360) {
         R = C;
         G = 0;
         B = X;
     }
+
+  
 
     R = (R + m) * 255;
     G = (G + m) * 255;
