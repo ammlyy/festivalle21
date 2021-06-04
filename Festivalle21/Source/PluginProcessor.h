@@ -69,7 +69,7 @@ private:
     double samplesPerBlock;
     std::vector<std::vector<float>> av;
     int currentAVindex;
-    fdeep::model model = fdeep::load_model("C:\\Users\\amere\\source\\Repos\\festivalle21\\Festivalle21\\Source\\models\\exported\\exported_model.json");
+    fdeep::model model = fdeep::load_model("C:\\Users\\gabri\\festivalle21\\Festivalle21\\Source\\models\\exported\\exported_model.json");
     std::vector<float> bufferToFill;
     int bufferToFillSampleIdx;
     juce::OSCSender sender;
@@ -78,4 +78,5 @@ private:
 
     //==============================================================================
     void predictAV(std::vector<float> buffer);
+    //JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Festivalle21AudioProcessor)
 };
