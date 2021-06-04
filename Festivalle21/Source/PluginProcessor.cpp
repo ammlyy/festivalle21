@@ -10,7 +10,6 @@
 #include "PluginEditor.h"
 
 using namespace std;
-const float BUFFER_SIZE = 0.5; //500 ms
 
 //==============================================================================
 Festivalle21AudioProcessor::Festivalle21AudioProcessor()
@@ -28,7 +27,9 @@ Festivalle21AudioProcessor::Festivalle21AudioProcessor()
     this->sampleRate = 0.0;
     this->samplesPerBlock = 0.0;
     this->bufferToFillSampleIdx = 0;
+    this->bufferToFill.setSize(1, BUFFER_SIZE);
     this->av = std::vector<std::vector<float>>(COLOR_FREQUENCY, std::vector<float>(2,0));
+    this->rms = 0.0f;
     this->currentAVindex = 0;
 
     // specify here where to send OSC messages to: host URL and UDP port number
@@ -113,7 +114,7 @@ void Festivalle21AudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     this->sampleRate = sampleRate;
     this->samplesPerBlock = samplesPerBlock;
     //this->bufferToFill.resize(sampleRate * BUFFER_SIZE); // Initiliase the array to contain 500ms
-    this->bufferToFill.resize(22050); // Initiliase the array to contain 500ms
+   // this->bufferToFill.resize(22050); // Initiliase the array to contain 500ms
 }
 
 void Festivalle21AudioProcessor::releaseResources()
@@ -180,13 +181,29 @@ void Festivalle21AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         }
 
         monoSample /= totalNumInputChannels;
-        this->bufferToFill[this->bufferToFillSampleIdx] = monoSample;
+        this->bufferToFill.getWritePointer(0)[this->bufferToFillSampleIdx] = monoSample;
 
         this->bufferToFillSampleIdx++;
-        if (this->bufferToFillSampleIdx == this->bufferToFill.size())
+        if (this->bufferToFillSampleIdx == BUFFER_SIZE)
         {
             this->bufferToFillSampleIdx = 0;
-            this->predictAV(this->bufferToFill);
+
+            this->av.at(currentAVindex) = this->predictAV(this->bufferToFill);
+            this->rms = this->bufferToFill.getRMSLevel(0, 0, BUFFER_SIZE);
+
+            sender.send("/juce/RMS", juce::OSCArgument(this->rms));
+
+            
+            this->currentAVindex++;
+            if (this->currentAVindex == COLOR_FREQUENCY) {
+                std::vector<float> msg;
+                msg = this->getRGBValue(this->av);
+                // create and send an OSC message with an address and a float value:
+                if (!sender.send("/juce/RGB", juce::OSCArgument(msg[0]), juce::OSCArgument(msg[1]), juce::OSCArgument(msg[2])))
+                    this->av.clear();
+
+                this->currentAVindex = 0;
+            }
         }
     }
 
@@ -230,27 +247,14 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
     return new Festivalle21AudioProcessor();
 }
 
-void Festivalle21AudioProcessor::predictAV(std::vector<float> buffer)
+std::vector<float> Festivalle21AudioProcessor::predictAV(juce::AudioBuffer<float> buffer)
 {
-        const fdeep::tensor input(fdeep::tensor_shape(22050, 1), buffer);
+        std::vector<float> my_vector{ buffer.getReadPointer(0), buffer.getReadPointer(0) + BUFFER_SIZE };
+        const fdeep::tensor input(fdeep::tensor_shape(22050, 1), my_vector);
 
-        //DBG(fdeep::show_tensor_shape(input.shape()));
-        const fdeep::tensors result = model.predict({
-        input
-            });
-
-        this->av.at(currentAVindex) = (result[0].to_vector());
-        this->currentAVindex++;
-        if (this->currentAVindex == COLOR_FREQUENCY) {
-            std::vector<float> msg;
-            msg = this->getRGBValue(this->av);
-            // create and send an OSC message with an address and a float value:
-            if (!sender.send("/juce/RGB", juce::OSCArgument(msg[0]), juce::OSCArgument(msg[1]), juce::OSCArgument(msg[2])))
-                this->av.clear();
-
-            this->currentAVindex = 0;
-        }
-        
+        const fdeep::tensors result = model.predict({input});
+       
+        return result[0].to_vector();
 }
 
 std::vector<float> Festivalle21AudioProcessor::getRGBValue(std::vector<std::vector<float>> av)
@@ -270,11 +274,11 @@ std::vector<float> Festivalle21AudioProcessor::getRGBValue(std::vector<std::vect
     avg_arousal /= av.size();
 
     float H = atan2(avg_arousal, avg_valence) * 180.0 / PI;    // Hue
-    float S = std::min(sqrt(pow(avg_valence, 2) * pow(avg_arousal, 2)), 1.0);    // Saturation (distance)
+    float S = std::min(sqrt(pow(avg_valence, 2) + pow(avg_arousal, 2)), 1.0);    // Saturation (distance)
     float V = 1.0;  //Intensity
 
     float C = V * S;
-    float X = C * (1 - std::abs(std::fmod((H / 60.0), 2.0) - 1.0));
+    float X = C * (1.0 - std::abs(std::fmod((H / 60.0), 2.0) - 1.0));
     float m = V - C;
 
     if (H >= 0 && H < 60) {

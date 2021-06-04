@@ -79,11 +79,11 @@ void Festivalle21AudioProcessorEditor::drawPoint(juce::Graphics& g)
 {
     const auto av = this->audioProcessor.getAV();
     const auto centre = getLocalBounds().toFloat().getCentre();
-    float diameter = getWidth() / 2.0;
+    float radius = getWidth() / 4.0;
 
 
 
-    g.drawEllipse(centre.x + av[1] * diameter, centre.y - av[0] * diameter, 5.f, 5.f, 3.f);
+    g.drawEllipse(centre.x + av[1] * radius, centre.y - av[0] * radius, 5.f, 5.f, 3.f);
 
 
 }

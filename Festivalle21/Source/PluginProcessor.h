@@ -13,6 +13,7 @@
 #include <string>
 
 #define PI 3.14159265
+#define BUFFER_SIZE 22050 //500 ms at 44.1kHz
 
 #define COLOR_FREQUENCY 6 // number of 500ms windows analyzed before sending a color change (3seconds)
 #define SCENE_SELECTOR 20 // number of 500ms windows analyzed before sending a Scene triger (10seconds)
@@ -68,14 +69,15 @@ private:
     double sampleRate;
     double samplesPerBlock;
     std::vector<std::vector<float>> av;
+    float rms;
     int currentAVindex;
     fdeep::model model = fdeep::load_model("C:\\Users\\amere\\source\\Repos\\festivalle21\\Festivalle21\\Source\\models\\exported\\exported_model.json");
-    std::vector<float> bufferToFill;
+    juce::AudioBuffer<float> bufferToFill;
     int bufferToFillSampleIdx;
     juce::OSCSender sender;
     std::vector<float> getRGBValue(std::vector<std::vector<float>>);
 
 
     //==============================================================================
-    void predictAV(std::vector<float> buffer);
+    std::vector<float> predictAV(juce::AudioBuffer<float> buffer);
 };
