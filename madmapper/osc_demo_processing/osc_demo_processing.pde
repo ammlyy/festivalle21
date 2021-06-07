@@ -11,7 +11,7 @@ void setup() {
   }
 
 void draw() {
-background(R,G,B);
+  background(R, G, B);
 }
 
 /* incoming osc message are forwarded to the oscEvent method. */
@@ -26,4 +26,5 @@ void oscEvent(OscMessage msg) {
       println(" values: "+R+" "+G+" "+B+" ");
       return;
   }
+
 }

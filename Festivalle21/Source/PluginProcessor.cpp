@@ -37,7 +37,7 @@ Festivalle21AudioProcessor::Festivalle21AudioProcessor()
     this->currentAVindex = 0;
 
     // specify here where to send OSC messages to: host URL and UDP port number
-    if (!sender.connect("192.168.1.9", 5005))   // [4]
+    if (!sender.connect("127.0.0.1", 5005))   // [4]
         DBG("Error: could not connect to UDP port 5005."); 
 
 
@@ -303,11 +303,15 @@ std::vector<float> Festivalle21AudioProcessor::getRGBValue(std::vector<std::vect
     avg_valence /= av.size();
     avg_arousal /= av.size();
 
-    float H = (atan2(avg_arousal, avg_valence) * 180.0 / PI );    // Hue
+    avg_valence = min(1.f, avg_valence * SCALING_FACTOR);
+    avg_arousal = min(1.f, avg_arousal * SCALING_FACTOR);
+
+    float H = (atan2(avg_valence, avg_arousal) * 180.0 / PI );    // Hue
     if (H < 0) {
         H = 360.0 + H;
     }
-    float S = std::min(sqrt(pow(avg_valence, 2) + pow(avg_arousal, 2)), 1.0);    // Saturation (distance)
+    DBG("H: " + to_string(H));
+    float S = min(sqrt(pow(avg_valence, 2) + pow(avg_arousal, 2)), 1.0);    // Saturation (distance)
     float V = 1.0;  //Intensity
 
     float C = V * S;
@@ -345,15 +349,13 @@ std::vector<float> Festivalle21AudioProcessor::getRGBValue(std::vector<std::vect
         B = X;
     }
 
-  
-
     R = (R + m) * 255;
     G = (G + m) * 255;
     B = (B + m) * 255;
 
-    DBG(R);
-    DBG(G);
-    DBG(B);
+    DBG("R: " + to_string(R));
+    DBG("G: " + to_string(G));
+    DBG("B: " + to_string(B));
 
     return { R,G,B };
 }

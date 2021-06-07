@@ -17,7 +17,8 @@
 
 #define COLOR_FREQUENCY 6 // number of 500ms windows analyzed before sending a color change (3seconds)
 #define SCENE_SELECTOR 20 // number of 500ms windows analyzed before sending a Scene triger (10seconds)
-#define MEASURE_TIME 0  // comment this line not to measure prediction time
+//#define MEASURE_TIME 0  // comment this line not to measure prediction time
+#define SCALING_FACTOR 3
 
 //#define PATH_TO_JSON = "D:\\GitHub\\festivalle21\\Festivalle21\\Source\\models\\exported\\pred_model.json";
 
@@ -76,7 +77,7 @@ private:
     std::vector<std::vector<float>> av;
     float rms;
     int currentAVindex;
-    fdeep::model model = fdeep::load_model("D:\\GitHub\\festivalle21\\Festivalle21\\Source\\models\\exported\\exported_model.json");
+    fdeep::model model = fdeep::load_model("C:\\Users\\gabri\\festivalle21\\Festivalle21\\Source\\models\\exported\\exported_model.json");
     juce::AudioBuffer<float> bufferToFill;
     int bufferToFillSampleIdx;
     juce::OSCSender sender;
