@@ -18,6 +18,20 @@ Festivalle21AudioProcessorEditor::Festivalle21AudioProcessorEditor (Festivalle21
     this->startTimerHz(60);
     this->colorWheel = juce::ImageCache::getFromMemory(BinaryData::COLOR_WHEEL_png, BinaryData::COLOR_WHEEL_pngSize);
     this->colorWheel = this->colorWheel.rescaled(getWidth() / 2.0 , getWidth() /2.0, juce::Graphics::highResamplingQuality);
+
+    this->port.setText("5005", juce::dontSendNotification);
+    this->ip.setText("127.0.0.1", juce::dontSendNotification);
+    this->port.setEditable(true);
+    this->ip.setEditable(true);
+    this->port.setFont(20.0f);
+    this->ip.setFont(20.0f);
+
+    this->ip.setBounds(10, 50, 75, 25);
+    this->port.setBounds(10, 10, 75, 25);
+
+    addAndMakeVisible(this->port);
+    addAndMakeVisible(this->ip);
+
 }
 
 Festivalle21AudioProcessorEditor::~Festivalle21AudioProcessorEditor()
@@ -32,7 +46,7 @@ void Festivalle21AudioProcessorEditor::timerCallback()
 void Festivalle21AudioProcessorEditor::paint (juce::Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
+    g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
     g.setColour(juce::Colours::white);
     float diameter = getWidth()/2.0;
     juce::Point<float> top(getWidth() / 2, (getHeight() - diameter) * 0.5);
@@ -41,25 +55,7 @@ void Festivalle21AudioProcessorEditor::paint (juce::Graphics& g)
     juce::Point<float> right((getWidth() + diameter) * 0.5, getHeight() / 2.0);
 
     g.drawImageAt(this->colorWheel, (getWidth() - diameter) / 2.0, (getHeight() - diameter) / 2.0);
-
-  /*
-    //TOP
-    const auto centre = getLocalBounds().toFloat().getCentre();
-    const auto pi = juce::MathConstants<float>::pi;
-
-    juce::ColourGradient gradient(juce::Colours::blue, centre,
-        juce::Colours::blue, centre.withY(centre.y + 100.f),
-        true);
-    gradient.addColour(0.25, juce::Colours::purple);
-    gradient.addColour(0.5, juce::Colours::red);
-    gradient.addColour(0.75, juce::Colours::yellow);
-    g.setGradientFill(gradient);
-
-    juce::Path p;
-    float thickness = diameter/3.0 + 5;
-    p.addCentredArc(centre.x, centre.y, (diameter- thickness) * 0.5f, (diameter - thickness) * 0.5f, 0.f, -pi, pi, true);
-    g.strokePath(p, juce::PathStrokeType(thickness));
-   */
+    
 
     g.setColour(juce::Colours::white);
     g.setOpacity(0.3);
@@ -69,7 +65,7 @@ void Festivalle21AudioProcessorEditor::paint (juce::Graphics& g)
 
 
     this->drawPoint(g);
-
+    
 
     
 }

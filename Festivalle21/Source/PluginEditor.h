@@ -31,5 +31,7 @@ private:
     Festivalle21AudioProcessor& audioProcessor;
     void drawPoint(juce::Graphics& g);
     juce::Image colorWheel;
+    juce::Label port;
+    juce::Label ip;
     //JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Festivalle21AudioProcessorEditor)
 };
