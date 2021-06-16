@@ -20,9 +20,8 @@ if __name__ == "__main__":
   args = parser.parse_args()
 
   client = udp_client.SimpleUDPClient(args.ip, args.port)
-  scena = 0
+  RGB =[255, 255, 255]
   while True:
-    client.send_message("/scena/" + str(scena), 0.5)
-    print("Sent on scena/" + str(scena))
-    scena = (scena + 1) % 4
+    client.send_message("/juce/RGB", RGB)
+    print("Sent")
     time.sleep(0.2)
