@@ -16,6 +16,8 @@ Festivalle21AudioProcessorEditor::Festivalle21AudioProcessorEditor (Festivalle21
     // editor's size to whatever you need it to be.
     setSize (400, 300);
     this->startTimerHz(60);
+    this->colorWheel = juce::ImageCache::getFromMemory(BinaryData::COLOR_WHEEL_png, BinaryData::COLOR_WHEEL_pngSize);
+    this->colorWheel = this->colorWheel.rescaled(getWidth() / 2.0 , getWidth() /2.0, juce::Graphics::highResamplingQuality);
 }
 
 Festivalle21AudioProcessorEditor::~Festivalle21AudioProcessorEditor()
@@ -38,6 +40,8 @@ void Festivalle21AudioProcessorEditor::paint (juce::Graphics& g)
     juce::Point<float> left((getWidth() - diameter) * 0.5, getHeight() / 2.0);
     juce::Point<float> right((getWidth() + diameter) * 0.5, getHeight() / 2.0);
 
+    g.drawImageAt(this->colorWheel, (getWidth() - diameter) / 2.0, (getHeight() - diameter) / 2.0);
+
   /*
     //TOP
     const auto centre = getLocalBounds().toFloat().getCentre();
@@ -59,7 +63,7 @@ void Festivalle21AudioProcessorEditor::paint (juce::Graphics& g)
 
     g.setColour(juce::Colours::white);
     g.setOpacity(0.3);
-    g.drawEllipse((getWidth() - diameter) / 2.0, (getHeight() - diameter) / 2.0, diameter, diameter, 2);
+    g.drawEllipse((getWidth() - diameter) / 2.0, (getHeight() - diameter) / 2.0, diameter, diameter, 3);
     g.drawVerticalLine(getWidth() / 2, top.getY(), bottom.getY());
     g.drawHorizontalLine(getHeight() / 2.0, left.getX(), right.getX());
 

@@ -12,6 +12,9 @@
                 file="Source/models/exported/exported_model.json"/>
         </GROUP>
       </GROUP>
+      <GROUP id="{82B6BBF2-2A9F-142F-5E88-D7A97B619921}" name="assets">
+        <FILE id="Vnx11I" name="COLOR_WHEEL.png" compile="0" resource="1" file="../../../../Desktop/COLOR_WHEEL.png"/>
+      </GROUP>
       <FILE id="yhmuuw" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="rJh728" name="PluginProcessor.h" compile="0" resource="0"
