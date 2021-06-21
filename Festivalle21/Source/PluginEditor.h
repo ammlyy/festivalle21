@@ -10,6 +10,7 @@
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
+#include "ColorWheel.h"
 
 //==============================================================================
 /**
@@ -29,7 +30,6 @@ private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     Festivalle21AudioProcessor& audioProcessor;
-    void drawPoint(juce::Graphics& g);
-    juce::Image colorWheel;
+    ColorWheel colorwheel{ 400,300 };
     //JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Festivalle21AudioProcessorEditor)
 };
