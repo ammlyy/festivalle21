@@ -25,7 +25,7 @@
 //==============================================================================
 /**
 */
-class Festivalle21AudioProcessor  : public juce::AudioProcessor
+class Festivalle21AudioProcessor : public juce::AudioProcessor
 {
 public:
     //==============================================================================
@@ -33,14 +33,14 @@ public:
     ~Festivalle21AudioProcessor() override;
 
     //==============================================================================
-    void prepareToPlay (double sampleRate, int samplesPerBlock) override;
+    void prepareToPlay(double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
 
-   #ifndef JucePlugin_PreferredChannelConfigurations
-    bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
-   #endif
+#ifndef JucePlugin_PreferredChannelConfigurations
+    bool isBusesLayoutSupported(const BusesLayout& layouts) const override;
+#endif
 
-    void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
+    void processBlock(juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
 
     //==============================================================================
     juce::AudioProcessorEditor* createEditor() override;
@@ -57,27 +57,27 @@ public:
     //==============================================================================
     int getNumPrograms() override;
     int getCurrentProgram() override;
-    void setCurrentProgram (int index) override;
-    const juce::String getProgramName (int index) override;
-    void changeProgramName (int index, const juce::String& newName) override;
+    void setCurrentProgram(int index) override;
+    const juce::String getProgramName(int index) override;
+    void changeProgramName(int index, const juce::String& newName) override;
 
     //==============================================================================
-    void getStateInformation (juce::MemoryBlock& destData) override;
-    void setStateInformation (const void* data, int sizeInBytes) override;
+    void getStateInformation(juce::MemoryBlock& destData) override;
+    void setStateInformation(const void* data, int sizeInBytes) override;
     std::vector<float> getAV();
 
 private:
 
-    #ifdef MEASURE_TIME
-        std::ofstream myfile;
-    #endif
+#ifdef MEASURE_TIME
+    std::ofstream myfile;
+#endif
 
     double sampleRate;
     double samplesPerBlock;
     std::vector<std::vector<float>> av;
     float rms;
     int currentAVindex;
-    fdeep::model model = fdeep::load_model("C:\\Users\\amere\\source\\Repos\\festivalle21\\Festivalle21\\Source\\models\\exported\\exported_model.json");
+    fdeep::model model = fdeep::load_model("C:\\Users\\gabri\\festivalle21\\Festivalle21\\Source\\models\\exported\\exported_model.json");
     juce::AudioBuffer<float> bufferToFill;
     int bufferToFillSampleIdx;
     juce::OSCSender sender;
@@ -85,11 +85,15 @@ private:
     juce::String oscIpAddress;
     int oscPort;
 
-    // Methods
-
+    float avgValence;
+    float avgArousal;
+    float R;
+    float G;
+    float B;
 
     //==============================================================================
     std::vector<float> predictAV(juce::AudioBuffer<float> buffer);
-    std::vector<float> getRGBValue(std::vector<std::vector<float>>);
+    void calculateRGB();
+    void averageAV(std::vector<std::vector<float>>);
     void connectToOsc();
 };

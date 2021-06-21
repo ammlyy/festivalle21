@@ -14,40 +14,46 @@ using namespace std;
 //==============================================================================
 Festivalle21AudioProcessor::Festivalle21AudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
-     : AudioProcessor (BusesProperties()
-                     #if ! JucePlugin_IsMidiEffect
-                      #if ! JucePlugin_IsSynth
-                       .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
-                      #endif
-                       .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
-                     #endif
-                       ) 
+    : AudioProcessor(BusesProperties()
+#if ! JucePlugin_IsMidiEffect
+#if ! JucePlugin_IsSynth
+        .withInput("Input", juce::AudioChannelSet::stereo(), true)
+#endif
+        .withOutput("Output", juce::AudioChannelSet::stereo(), true)
+#endif
+    )
 #endif
 {
-    #ifdef MEASURE_TIME
-        this->myfile.open("timing_measure.txt");
-    #endif
+#ifdef MEASURE_TIME
+    this->myfile.open("timing_measure.txt");
+#endif
 
     this->sampleRate = 0.0;
     this->samplesPerBlock = 0.0;
     this->bufferToFillSampleIdx = 0;
     this->bufferToFill.setSize(1, BUFFER_SIZE);
-    this->av = std::vector<std::vector<float>>(COLOR_FREQUENCY, std::vector<float>(2,0));
+    this->av = std::vector<std::vector<float>>(COLOR_FREQUENCY, std::vector<float>(2, 0));
     this->rms = 0.0f;
     this->currentAVindex = 0;
+
+    this->avgArousal = 0;
+    this->avgValence = 0;
+    this->R = 0;
+    this->G = 0;
+    this->B = 0;
 
     this->oscIpAddress = "127.0.0.1";
     this->oscPort = 5005;
     this->connectToOsc();
 
-    
+
 }
 
 Festivalle21AudioProcessor::~Festivalle21AudioProcessor()
 {
-    #ifdef MEASURE_TIME
-        this->myfile.close();
-    #endif
+#ifdef MEASURE_TIME
+    this->myfile.close();
+#endif
 }
 
 //==============================================================================
@@ -58,29 +64,29 @@ const juce::String Festivalle21AudioProcessor::getName() const
 
 bool Festivalle21AudioProcessor::acceptsMidi() const
 {
-   #if JucePlugin_WantsMidiInput
+#if JucePlugin_WantsMidiInput
     return true;
-   #else
+#else
     return false;
-   #endif
+#endif
 }
 
 bool Festivalle21AudioProcessor::producesMidi() const
 {
-   #if JucePlugin_ProducesMidiOutput
+#if JucePlugin_ProducesMidiOutput
     return true;
-   #else
+#else
     return false;
-   #endif
+#endif
 }
 
 bool Festivalle21AudioProcessor::isMidiEffect() const
 {
-   #if JucePlugin_IsMidiEffect
+#if JucePlugin_IsMidiEffect
     return true;
-   #else
+#else
     return false;
-   #endif
+#endif
 }
 
 double Festivalle21AudioProcessor::getTailLengthSeconds() const
@@ -99,21 +105,21 @@ int Festivalle21AudioProcessor::getCurrentProgram()
     return 0;
 }
 
-void Festivalle21AudioProcessor::setCurrentProgram (int index)
+void Festivalle21AudioProcessor::setCurrentProgram(int index)
 {
 }
 
-const juce::String Festivalle21AudioProcessor::getProgramName (int index)
+const juce::String Festivalle21AudioProcessor::getProgramName(int index)
 {
     return {};
 }
 
-void Festivalle21AudioProcessor::changeProgramName (int index, const juce::String& newName)
+void Festivalle21AudioProcessor::changeProgramName(int index, const juce::String& newName)
 {
 }
 
 //==============================================================================
-void Festivalle21AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+void Festivalle21AudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
@@ -130,35 +136,35 @@ void Festivalle21AudioProcessor::releaseResources()
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
-bool Festivalle21AudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
+bool Festivalle21AudioProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const
 {
-  #if JucePlugin_IsMidiEffect
-    juce::ignoreUnused (layouts);
+#if JucePlugin_IsMidiEffect
+    juce::ignoreUnused(layouts);
     return true;
-  #else
+#else
     // This is the place where you check if the layout is supported.
     // In this template code we only support mono or stereo.
     if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono()
-     && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
+        && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
         return false;
 
     // This checks if the input layout matches the output layout
-   #if ! JucePlugin_IsSynth
+#if ! JucePlugin_IsSynth
     if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
         return false;
-   #endif
+#endif
 
     return true;
-  #endif
+#endif
 }
 #endif
 
-void Festivalle21AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
+void Festivalle21AudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     juce::ScopedNoDenormals noDenormals;
-    auto totalNumInputChannels  = getTotalNumInputChannels();
+    auto totalNumInputChannels = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
-    
+
 
     // In case we have more outputs than inputs, this code clears any output
     // channels that didn't contain input data, (because these aren't
@@ -167,7 +173,7 @@ void Festivalle21AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     // when they first compile a plugin, but obviously you don't need to keep
     // this code if your algorithm always overwrites all the output channels.
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
+        buffer.clear(i, 0, buffer.getNumSamples());
 
     // This is the place where you'd normally do the guts of your plugin's
     // audio processing...
@@ -178,7 +184,7 @@ void Festivalle21AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
 
     if (this->connected)
     {
-        for (int sample = 0; sample < buffer.getNumSamples(); sample++) 
+        for (int sample = 0; sample < buffer.getNumSamples(); sample++)
         {
             float monoSample = 0.0;
 
@@ -196,18 +202,18 @@ void Festivalle21AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
             {
                 this->bufferToFillSampleIdx = 0;
 
-                #ifdef MEASURE_TIME
+#ifdef MEASURE_TIME
                 using std::chrono::high_resolution_clock;
                 using std::chrono::duration_cast;
                 using std::chrono::duration;
                 using std::chrono::milliseconds;
 
                 auto t1 = high_resolution_clock::now();
-                #endif
+#endif
 
                 this->av.at(currentAVindex) = this->predictAV(this->bufferToFill);
 
-                #ifdef MEASURE_TIME
+#ifdef MEASURE_TIME
                 auto t2 = high_resolution_clock::now();
 
                 /* Getting number of milliseconds as an integer. */
@@ -218,19 +224,26 @@ void Festivalle21AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
                 this->myfile << to_string(ms_double.count());
                 this->myfile << "\n";
                 DBG(ms_double.count());
-                #endif
+#endif
 
                 this->rms = this->bufferToFill.getRMSLevel(0, 0, BUFFER_SIZE);
+                //this->rms = max(20 * log(this->rms / 20), -100.f);               //convert to dB
+                this->rms = max(20 * log(this->rms / 20) / 2, -100.f);               //convert to dB
+                DBG(this->rms);
 
-                sender.send("/juce/RMS", juce::OSCArgument(this->rms));
+                this->calculateRGB();
+                sender.send("/juce/RGB", juce::OSCArgument(this->R), juce::OSCArgument(this->G), juce::OSCArgument(this->B));
 
-            
+
                 this->currentAVindex++;
                 if (this->currentAVindex == COLOR_FREQUENCY) {
                     std::vector<float> msg;
-                    msg = this->getRGBValue(this->av);
+                    //msg = this->getRGBValue(this->av);
+                    this->averageAV(this->av);
+                    //this->calculateRGB();
+                    //msg = this->getRGB();
                     // create and send an OSC message with an address and a float value:
-                    sender.send("/juce/RGB", juce::OSCArgument(msg[0]), juce::OSCArgument(msg[1]), juce::OSCArgument(msg[2]));
+                    //sender.send("/juce/RGB", juce::OSCArgument(this->R), juce::OSCArgument(this->G), juce::OSCArgument(this->B));
                     this->currentAVindex = 0;
                 }
             }
@@ -238,7 +251,7 @@ void Festivalle21AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
 
     }
 
-   
+
 }
 
 //==============================================================================
@@ -249,18 +262,18 @@ bool Festivalle21AudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* Festivalle21AudioProcessor::createEditor()
 {
-    return new Festivalle21AudioProcessorEditor (*this);
+    return new Festivalle21AudioProcessorEditor(*this);
 }
 
 //==============================================================================
-void Festivalle21AudioProcessor::getStateInformation (juce::MemoryBlock& destData)
+void Festivalle21AudioProcessor::getStateInformation(juce::MemoryBlock& destData)
 {
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
 }
 
-void Festivalle21AudioProcessor::setStateInformation (const void* data, int sizeInBytes)
+void Festivalle21AudioProcessor::setStateInformation(const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
@@ -280,22 +293,72 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 
 std::vector<float> Festivalle21AudioProcessor::predictAV(juce::AudioBuffer<float> buffer)
 {
-        std::vector<float> my_vector{ buffer.getReadPointer(0), buffer.getReadPointer(0) + BUFFER_SIZE };
-        const fdeep::tensor input(fdeep::tensor_shape(22050, 1), my_vector);
+    std::vector<float> my_vector{ buffer.getReadPointer(0), buffer.getReadPointer(0) + BUFFER_SIZE };
+    const fdeep::tensor input(fdeep::tensor_shape(22050, 1), my_vector);
 
-        const fdeep::tensors result = model.predict({input});
-       
-        return result[0].to_vector();
+    const fdeep::tensors result = model.predict({ input });
+
+    return result[0].to_vector();
 }
 
-std::vector<float> Festivalle21AudioProcessor::getRGBValue(std::vector<std::vector<float>> av)
+void Festivalle21AudioProcessor::calculateRGB()
+{
+    float H = (atan2(this->avgValence, this->avgArousal) * 180.0 / PI);    // Hue
+    if (H < 0) {
+        H = 360.0 + H;
+    }
+    DBG("H: " + to_string(H));
+    float S = min(sqrt(pow(this->avgValence, 2) + pow(this->avgArousal, 2)), 1.0);    // Saturation (distance)
+    float V = 1.0 + this->rms / 100;  //Intensity
+
+    float C = V * S;
+    float X = C * (1.0 - std::abs(std::fmod((H / 60.0), 2.0) - 1.0));
+    float m = V - C;
+
+    if (H >= 0 && H < 60) {
+        this->R = C;
+        this->G = X;
+        this->B = 0;
+    }
+    else if (H >= 60 && H < 120) {
+        this->R = X;
+        this->G = C;
+        this->B = 0;
+    }
+    else if (H >= 120 && H < 180) {
+        this->R = 0;
+        this->G = C;
+        this->B = X;
+    }
+    else if (H >= 180 && H < 240) {
+        this->R = 0;
+        this->G = X;
+        this->B = C;
+    }
+    else if (H >= 240 && H < 300) {
+        this->R = X;
+        this->G = 0;
+        this->B = C;
+    }
+    else if (H >= 300 && H <= 360) {
+        this->R = C;
+        this->G = 0;
+        this->B = X;
+    }
+
+    this->R = (this->R + m) * 255;
+    this->G = (this->G + m) * 255;
+    this->B = (this->B + m) * 255;
+
+    DBG("R: " + to_string(this->R));
+    DBG("G: " + to_string(this->G));
+    DBG("B: " + to_string(this->B));
+}
+
+void Festivalle21AudioProcessor::averageAV(std::vector<std::vector<float>> av)
 {
     float avg_valence = 0.0f;
     float avg_arousal = 0.0f;
-
-    float R = 0.0f;
-    float G = 0.0f;
-    float B = 0.0f;
 
     for (int i = 0; i < COLOR_FREQUENCY; i++) {
         avg_valence += av[i][1];
@@ -304,61 +367,8 @@ std::vector<float> Festivalle21AudioProcessor::getRGBValue(std::vector<std::vect
     avg_valence /= av.size();
     avg_arousal /= av.size();
 
-    avg_valence = min(1.f, avg_valence * SCALING_FACTOR);
-    avg_arousal = min(1.f, avg_arousal * SCALING_FACTOR);
-
-    float H = (atan2(avg_valence, avg_arousal) * 180.0 / PI );    // Hue
-    if (H < 0) {
-        H = 360.0 + H;
-    }
-    DBG("H: " + to_string(H));
-    float S = min(sqrt(pow(avg_valence, 2) + pow(avg_arousal, 2)), 1.0);    // Saturation (distance)
-    float V = 1.0;  //Intensity
-
-    float C = V * S;
-    float X = C * (1.0 - std::abs(std::fmod((H / 60.0), 2.0) - 1.0));
-    float m = V - C;
-
-    if (H >= 0 && H < 60) {
-        R = C;
-        G = X;
-        B = 0;
-    }
-    else if (H >= 60 && H < 120) {
-        R = X;
-        G = C;
-        B = 0;
-    }
-    else if (H >= 120 && H < 180) {
-        R = 0;
-        G = C;
-        B = X;
-    }
-    else if (H >= 180 && H < 240) {
-        R = 0;
-        G = X;
-        B = C;
-    }
-    else if (H >= 240 && H < 300) {
-        R = X;
-        G = 0;
-        B = C;
-    }
-    else if (H >= 300 && H <= 360) {
-        R = C;
-        G = 0;
-        B = X;
-    }
-
-    R = (R + m) * 255;
-    G = (G + m) * 255;
-    B = (B + m) * 255;
-
-    DBG("R: " + to_string(R));
-    DBG("G: " + to_string(G));
-    DBG("B: " + to_string(B));
-
-    return { R,G,B };
+    this->avgValence = min(1.f, avg_valence * SCALING_FACTOR);
+    this->avgArousal = min(1.f, avg_arousal * SCALING_FACTOR);
 }
 
 void Festivalle21AudioProcessor::connectToOsc()
