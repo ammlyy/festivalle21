@@ -40,7 +40,6 @@ Festivalle21AudioProcessor::Festivalle21AudioProcessor()
     this->oscPort = 5005;
     this->connectToOsc();
 
-    
 }
 
 Festivalle21AudioProcessor::~Festivalle21AudioProcessor()
@@ -271,6 +270,20 @@ std::vector<float> Festivalle21AudioProcessor::getAV()
     return this->av.at(0);
 }
 
+bool Festivalle21AudioProcessor::setIP(juce::String ipAddress)
+{
+    this->oscIpAddress = ipAddress;    
+    this->connectToOsc();
+    return this->connected;
+}
+
+bool Festivalle21AudioProcessor::setPort(juce::String port)
+{
+    this->oscPort = port.getIntValue();
+    this->connectToOsc();
+    return this->connected;
+}
+
 //==============================================================================
 // This creates new instances of the plugin..
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
@@ -363,7 +376,6 @@ std::vector<float> Festivalle21AudioProcessor::getRGBValue(std::vector<std::vect
 
 void Festivalle21AudioProcessor::connectToOsc()
 {
-    bool ret = false;
     // specify here where to send OSC messages to: host URL and UDP port number
     sender.connect(this->oscIpAddress, this->oscPort);   // [4]
 

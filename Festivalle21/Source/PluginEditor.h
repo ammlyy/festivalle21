@@ -31,7 +31,10 @@ private:
     // access the processor object that created it.
     Festivalle21AudioProcessor& audioProcessor;
     ColorWheel colorwheel{ 400,300 };
-    juce::Label port;
-    juce::Label ip;
+    juce::Label portLabel;
+    juce::Label portInput;
+    juce::Label ipLabel;
+    juce::Label ipInput;
+
     //JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Festivalle21AudioProcessorEditor)
 };
