@@ -16,7 +16,8 @@ Festivalle21AudioProcessorEditor::Festivalle21AudioProcessorEditor (Festivalle21
     // editor's size to whatever you need it to be.
     setSize (400, 300);
     this->startTimerHz(60);
-    addAndMakeVisible(this->colorwheel);
+    this->colorWheel = juce::ImageCache::getFromMemory(BinaryData::COLOR_WHEEL_png, BinaryData::COLOR_WHEEL_pngSize);
+    this->colorWheel = this->colorWheel.rescaled(getWidth() / 2.0 , getWidth() /2.0, juce::Graphics::highResamplingQuality);
 }
 
 Festivalle21AudioProcessorEditor::~Festivalle21AudioProcessorEditor()

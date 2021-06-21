@@ -36,10 +36,9 @@ Festivalle21AudioProcessor::Festivalle21AudioProcessor()
     this->rms = 0.0f;
     this->currentAVindex = 0;
 
-    // specify here where to send OSC messages to: host URL and UDP port number
-    if (!sender.connect("127.0.0.1", 5005))   // [4]
-        DBG("Error: could not connect to UDP port 5005."); 
-
+    this->oscIpAddress = "127.0.0.1";
+    this->oscPort = 5005;
+    this->connectToOsc();
 
     
 }
@@ -177,64 +176,66 @@ void Festivalle21AudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     // Alternatively, you can process the samples with the channels
     // interleaved by keeping the same state.
 
-    for (int sample = 0; sample < buffer.getNumSamples(); sample++) 
+    if (this->connected)
     {
-        float monoSample = 0.0;
-
-        for (int channel = 0; channel < totalNumInputChannels; ++channel)
+        for (int sample = 0; sample < buffer.getNumSamples(); sample++) 
         {
-            auto* inputChannelData = buffer.getReadPointer(channel);
-            monoSample += inputChannelData[sample];
-        }
+            float monoSample = 0.0;
 
-        monoSample /= totalNumInputChannels;
-        this->bufferToFill.getWritePointer(0)[this->bufferToFillSampleIdx] = monoSample;
+            for (int channel = 0; channel < totalNumInputChannels; ++channel)
+            {
+                auto* inputChannelData = buffer.getReadPointer(channel);
+                monoSample += inputChannelData[sample];
+            }
 
-        this->bufferToFillSampleIdx++;
-        if (this->bufferToFillSampleIdx == BUFFER_SIZE)
-        {
-            this->bufferToFillSampleIdx = 0;
+            monoSample /= totalNumInputChannels;
+            this->bufferToFill.getWritePointer(0)[this->bufferToFillSampleIdx] = monoSample;
 
-            #ifdef MEASURE_TIME
-            using std::chrono::high_resolution_clock;
-            using std::chrono::duration_cast;
-            using std::chrono::duration;
-            using std::chrono::milliseconds;
+            this->bufferToFillSampleIdx++;
+            if (this->bufferToFillSampleIdx == BUFFER_SIZE)
+            {
+                this->bufferToFillSampleIdx = 0;
 
-            auto t1 = high_resolution_clock::now();
-            #endif
+                #ifdef MEASURE_TIME
+                using std::chrono::high_resolution_clock;
+                using std::chrono::duration_cast;
+                using std::chrono::duration;
+                using std::chrono::milliseconds;
 
-            this->av.at(currentAVindex) = this->predictAV(this->bufferToFill);
+                auto t1 = high_resolution_clock::now();
+                #endif
 
-            #ifdef MEASURE_TIME
-            auto t2 = high_resolution_clock::now();
+                this->av.at(currentAVindex) = this->predictAV(this->bufferToFill);
 
-            /* Getting number of milliseconds as an integer. */
-            auto ms_int = duration_cast<milliseconds>(t2 - t1);
+                #ifdef MEASURE_TIME
+                auto t2 = high_resolution_clock::now();
 
-            /* Getting number of milliseconds as a double. */
-            duration<double, std::milli> ms_double = t2 - t1;
-            this->myfile << to_string(ms_double.count());
-            this->myfile << "\n";
-            DBG(ms_double.count());
-            #endif
+                /* Getting number of milliseconds as an integer. */
+                auto ms_int = duration_cast<milliseconds>(t2 - t1);
 
-            this->rms = this->bufferToFill.getRMSLevel(0, 0, BUFFER_SIZE);
+                /* Getting number of milliseconds as a double. */
+                duration<double, std::milli> ms_double = t2 - t1;
+                this->myfile << to_string(ms_double.count());
+                this->myfile << "\n";
+                DBG(ms_double.count());
+                #endif
 
-            sender.send("/juce/RMS", juce::OSCArgument(this->rms));
+                this->rms = this->bufferToFill.getRMSLevel(0, 0, BUFFER_SIZE);
+
+                sender.send("/juce/RMS", juce::OSCArgument(this->rms));
 
             
-            this->currentAVindex++;
-            if (this->currentAVindex == COLOR_FREQUENCY) {
-                std::vector<float> msg;
-                msg = this->getRGBValue(this->av);
-                // create and send an OSC message with an address and a float value:
-                if (!sender.send("/juce/RGB", juce::OSCArgument(msg[0]), juce::OSCArgument(msg[1]), juce::OSCArgument(msg[2])))
-                    this->av.clear();
-
-                this->currentAVindex = 0;
+                this->currentAVindex++;
+                if (this->currentAVindex == COLOR_FREQUENCY) {
+                    std::vector<float> msg;
+                    msg = this->getRGBValue(this->av);
+                    // create and send an OSC message with an address and a float value:
+                    sender.send("/juce/RGB", juce::OSCArgument(msg[0]), juce::OSCArgument(msg[1]), juce::OSCArgument(msg[2]));
+                    this->currentAVindex = 0;
+                }
             }
         }
+
     }
 
    
@@ -358,4 +359,13 @@ std::vector<float> Festivalle21AudioProcessor::getRGBValue(std::vector<std::vect
     DBG("B: " + to_string(B));
 
     return { R,G,B };
+}
+
+void Festivalle21AudioProcessor::connectToOsc()
+{
+    bool ret = false;
+    // specify here where to send OSC messages to: host URL and UDP port number
+    sender.connect(this->oscIpAddress, this->oscPort);   // [4]
+
+    this->oscPort >= 65536 ? this->connected = false : this->connected = true;
 }

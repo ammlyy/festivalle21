@@ -81,9 +81,15 @@ private:
     juce::AudioBuffer<float> bufferToFill;
     int bufferToFillSampleIdx;
     juce::OSCSender sender;
-    std::vector<float> getRGBValue(std::vector<std::vector<float>>);
+    bool connected;         // True if the OSC port is valid (< 65536)
+    juce::String oscIpAddress;
+    int oscPort;
+
+    // Methods
 
 
     //==============================================================================
     std::vector<float> predictAV(juce::AudioBuffer<float> buffer);
+    std::vector<float> getRGBValue(std::vector<std::vector<float>>);
+    void connectToOsc();
 };
