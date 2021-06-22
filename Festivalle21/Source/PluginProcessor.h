@@ -109,6 +109,6 @@ private:
     void calculateRGB();
     void averageAV(std::vector<std::vector<float>>);
     void connectToOsc();
-    void ryb2RGB();
+    void ryb2RGB(float r, float y, float b);
     float cubicInterp(float t, float A, float B);
 };

@@ -315,6 +315,7 @@ std::vector<float> Festivalle21AudioProcessor::predictAV(juce::AudioBuffer<float
 
 void Festivalle21AudioProcessor::calculateRGB()
 {
+    
     float H = (atan2(this->avgValence, this->avgArousal) * 180.0 / PI);    // Hue
     if (H < 0) {
         H = 360.0 + H;
@@ -362,7 +363,10 @@ void Festivalle21AudioProcessor::calculateRGB()
     this->G = (this->G + m);
     this->B = (this->B + m);
 
-    ryb2RGB();
+    ryb2RGB(this->R, this->G, this->B);
+    this->R *= 255.0f;
+    this->G *= 255.0f;
+    this->B *= 255.0f;
 
     DBG("R: " + to_string(this->R));
     DBG("G: " + to_string(this->G));
@@ -393,35 +397,35 @@ void Festivalle21AudioProcessor::connectToOsc()
     this->oscPort >= 65536 ? this->connected = false : this->connected = true;
 }
 
-void Festivalle21AudioProcessor::ryb2RGB()
+void Festivalle21AudioProcessor::ryb2RGB(float r, float y, float b)
 {
-    float x0 = this->cubicInterp(this->B, RYB_COLORS[0][0], RYB_COLORS[4][0]);
-    float x1 = this->cubicInterp(this->B, RYB_COLORS[1][0], RYB_COLORS[5][0]);
-    float x2 = this->cubicInterp(this->B, RYB_COLORS[2][0], RYB_COLORS[6][0]);
-    float x3 = this->cubicInterp(this->B, RYB_COLORS[3][0], RYB_COLORS[7][0]);
-    float y0 = this->cubicInterp(this->G, x0, x1);
-    float y1 = this->cubicInterp(this->G, x2, x3);
+    float x0 = this->cubicInterp(b, RYB_COLORS[0][0], RYB_COLORS[4][0]);
+    float x1 = this->cubicInterp(b, RYB_COLORS[1][0], RYB_COLORS[5][0]);
+    float x2 = this->cubicInterp(b, RYB_COLORS[2][0], RYB_COLORS[6][0]);
+    float x3 = this->cubicInterp(b, RYB_COLORS[3][0], RYB_COLORS[7][0]);
+    float y0 = this->cubicInterp(y, x0, x1);
+    float y1 = this->cubicInterp(y, x2, x3);
 
-    this->R = this->cubicInterp(this->R, y0, y1);
+    this->R = this->cubicInterp(r, y0, y1);
 
-     x0 = this->cubicInterp(this->B, RYB_COLORS[0][1], RYB_COLORS[4][1]);
-     x1 = this->cubicInterp(this->B, RYB_COLORS[1][1], RYB_COLORS[5][1]);
-     x2 = this->cubicInterp(this->B, RYB_COLORS[2][1], RYB_COLORS[6][1]);
-     x3 = this->cubicInterp(this->B, RYB_COLORS[3][1], RYB_COLORS[7][1]);
-     y0 = this->cubicInterp(this->G, x0, x1);
-     y1 = this->cubicInterp(this->G, x2, x3);
+     x0 = this->cubicInterp(b, RYB_COLORS[0][1], RYB_COLORS[4][1]);
+     x1 = this->cubicInterp(b, RYB_COLORS[1][1], RYB_COLORS[5][1]);
+     x2 = this->cubicInterp(b, RYB_COLORS[2][1], RYB_COLORS[6][1]);
+     x3 = this->cubicInterp(b, RYB_COLORS[3][1], RYB_COLORS[7][1]);
+     y0 = this->cubicInterp(y, x0, x1);
+     y1 = this->cubicInterp(y, x2, x3);
 
-    this->G = this->cubicInterp(this->R, y0, y1);
+    this->G = this->cubicInterp(r, y0, y1);
 
 
-    x0 = this->cubicInterp(this->B, RYB_COLORS[0][2], RYB_COLORS[4][2]);
-    x1 = this->cubicInterp(this->B, RYB_COLORS[1][2], RYB_COLORS[5][2]);
-    x2 = this->cubicInterp(this->B, RYB_COLORS[2][2], RYB_COLORS[6][2]);
-    x3 = this->cubicInterp(this->B, RYB_COLORS[3][2], RYB_COLORS[7][2]);
-    y0 = this->cubicInterp(this->G, x0, x1);
-    y1 = this->cubicInterp(this->G, x2, x3);
+    x0 = this->cubicInterp(b, RYB_COLORS[0][2], RYB_COLORS[4][2]);
+    x1 = this->cubicInterp(b, RYB_COLORS[1][2], RYB_COLORS[5][2]);
+    x2 = this->cubicInterp(b, RYB_COLORS[2][2], RYB_COLORS[6][2]);
+    x3 = this->cubicInterp(b, RYB_COLORS[3][2], RYB_COLORS[7][2]);
+    y0 = this->cubicInterp(y, x0, x1);
+    y1 = this->cubicInterp(y, x2, x3);
 
-    this->B = this->cubicInterp(this->R, y0, y1);
+    this->B = this->cubicInterp(r, y0, y1);
 
 }
 
