@@ -65,6 +65,8 @@ public:
     void getStateInformation(juce::MemoryBlock& destData) override;
     void setStateInformation(const void* data, int sizeInBytes) override;
     std::vector<float> getAV();
+    bool setIP(juce::String ipAddress);
+    bool setPort(juce::String port);
 
 private:
 
