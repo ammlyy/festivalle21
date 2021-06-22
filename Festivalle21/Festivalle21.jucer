@@ -13,7 +13,7 @@
         </GROUP>
       </GROUP>
       <GROUP id="{F9215F52-7CBA-466A-EAF1-1C6314C1C6C8}" name="assets">
-        <FILE id="orZvZo" name="COLOR_WHEEL.png" compile="0" resource="1" file="Source/assets/COLOR_WHEEL.png"/>
+        <FILE id="P7dQ0J" name="COLOR WHEEL.png" compile="0" resource="1" file="Source/assets/COLOR WHEEL.png"/>
       </GROUP>
       <FILE id="yhmuuw" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
