@@ -15,7 +15,7 @@
 #define PI 3.14159265
 #define BUFFER_SIZE 22050 //500 ms at 44.1kHz
 
-#define COLOR_FREQUENCY 6 // number of 500ms windows analyzed before sending a color change (3seconds)
+#define COLOR_FREQUENCY 4 // number of 500ms windows analyzed before sending a color change (3seconds)
 #define SCENE_SELECTOR 20 // number of 500ms windows analyzed before sending a Scene triger (10seconds)
 //#define MEASURE_TIME 0  // comment this line not to measure prediction time
 #define SCALING_FACTOR 3
