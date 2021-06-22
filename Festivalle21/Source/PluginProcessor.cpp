@@ -235,13 +235,7 @@ void Festivalle21AudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, 
 
                 this->currentAVindex++;
                 if (this->currentAVindex == COLOR_FREQUENCY) {
-                    std::vector<float> msg;
-                    //msg = this->getRGBValue(this->av);
                     this->averageAV(this->av);
-                    //this->calculateRGB();
-                    //msg = this->getRGB();
-                    // create and send an OSC message with an address and a float value:
-                    //sender.send("/juce/RGB", juce::OSCArgument(this->R), juce::OSCArgument(this->G), juce::OSCArgument(this->B));
                     this->currentAVindex = 0;
                 }
             }
@@ -279,7 +273,9 @@ void Festivalle21AudioProcessor::setStateInformation(const void* data, int sizeI
 
 std::vector<float> Festivalle21AudioProcessor::getAV()
 {
-    return this->av.at(0);
+    std::vector<float> avgVec = { this->avgArousal, this->avgValence };
+    return avgVec;
+    //return this->av.at(0);
 }
 
 bool Festivalle21AudioProcessor::setIP(juce::String ipAddress)
