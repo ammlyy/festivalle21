@@ -315,8 +315,7 @@ std::vector<float> Festivalle21AudioProcessor::predictAV(juce::AudioBuffer<float
 
 void Festivalle21AudioProcessor::calculateRGB()
 {
-    
-    float H = (atan2(this->avgValence, this->avgArousal) * 180.0 / PI);    // Hue
+    float H = (atan2(this->avgValence, this->avgArousal) * 180.0 / PI) + 30;    // Hue
     if (H < 0) {
         H = 360.0 + H;
     }

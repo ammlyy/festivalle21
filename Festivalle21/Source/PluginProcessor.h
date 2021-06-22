@@ -79,7 +79,7 @@ private:
     std::vector<std::vector<float>> av;
     float rms;
     int currentAVindex;
-    fdeep::model model = fdeep::load_model("C:\\Users\\amere\\source\\Repos\\festivalle21\\Festivalle21\\Source\\models\\exported\\exported_model.json");
+    fdeep::model model = fdeep::load_model("C:\\Users\\gabri\\festivalle21\\Festivalle21\\Source\\models\\exported\\exported_model.json");
     juce::AudioBuffer<float> bufferToFill;
     int bufferToFillSampleIdx;
     juce::OSCSender sender;
@@ -100,7 +100,7 @@ private:
         { 1.0, .5, 0.0 },
         {0.163, 0.373, 0.6},
         { 0.0, 0.66, 0.2 },
-        { .5, .5, 0.0 },
+        { .5, 0.0, 0.5 },
         { 0.2, 0.094, 0.0 }
     };
 
