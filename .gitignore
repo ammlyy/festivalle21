@@ -4,6 +4,7 @@ Festivalle21/.vs
 Festivalle21/.vscode
 py/venv
 .vs
+.vscode
 py/frugally-deep
 py/.vscode
 py/notebook/audiofiles

@@ -35,8 +35,8 @@ void ColorWheel::paint(juce::Graphics& g)
     g.drawImageAt(this->wheelImage, (getWidth() - diameter) / 2.0, (getHeight() - diameter) / 2.0);
 
     g.setColour(juce::Colours::white);
-    g.setOpacity(0.3);
-    g.drawEllipse((getWidth() - diameter) / 2.0, (getHeight() - diameter) / 2.0, diameter, diameter, 3);
+    g.setOpacity(1);
+    g.drawEllipse((getWidth() - diameter) / 2.0, (getHeight() - diameter) / 2.0, diameter, diameter, 4);
     g.drawVerticalLine(getWidth() / 2, top.getY(), bottom.getY());
     g.drawHorizontalLine(getHeight() / 2.0, left.getX(), right.getX());
     this->drawPoint(g, this->av);
@@ -46,7 +46,7 @@ void ColorWheel::paint(juce::Graphics& g)
 void ColorWheel::resized()
 {
     this->wheelImage = this->wheelImage.rescaled(getWidth() / 2.0, getWidth() / 2.0, juce::Graphics::highResamplingQuality);
-
+    this->repaint();
 }
 
 void ColorWheel::drawPoint(juce::Graphics& g, std::vector<float> av)
