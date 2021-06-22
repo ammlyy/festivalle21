@@ -358,9 +358,11 @@ void Festivalle21AudioProcessor::calculateRGB()
         this->B = X;
     }
 
-    this->R = (this->R + m) * 255;
-    this->G = (this->G + m) * 255;
-    this->B = (this->B + m) * 255;
+    this->R = (this->R + m);
+    this->G = (this->G + m);
+    this->B = (this->B + m);
+
+    ryb2RGB();
 
     DBG("R: " + to_string(this->R));
     DBG("G: " + to_string(this->G));
@@ -389,4 +391,43 @@ void Festivalle21AudioProcessor::connectToOsc()
     sender.connect(this->oscIpAddress, this->oscPort);   // [4]
 
     this->oscPort >= 65536 ? this->connected = false : this->connected = true;
+}
+
+void Festivalle21AudioProcessor::ryb2RGB()
+{
+    float x0 = this->cubicInterp(this->B, RYB_COLORS[0][0], RYB_COLORS[4][0]);
+    float x1 = this->cubicInterp(this->B, RYB_COLORS[1][0], RYB_COLORS[5][0]);
+    float x2 = this->cubicInterp(this->B, RYB_COLORS[2][0], RYB_COLORS[6][0]);
+    float x3 = this->cubicInterp(this->B, RYB_COLORS[3][0], RYB_COLORS[7][0]);
+    float y0 = this->cubicInterp(this->G, x0, x1);
+    float y1 = this->cubicInterp(this->G, x2, x3);
+
+    this->R = this->cubicInterp(this->R, y0, y1);
+
+     x0 = this->cubicInterp(this->B, RYB_COLORS[0][1], RYB_COLORS[4][1]);
+     x1 = this->cubicInterp(this->B, RYB_COLORS[1][1], RYB_COLORS[5][1]);
+     x2 = this->cubicInterp(this->B, RYB_COLORS[2][1], RYB_COLORS[6][1]);
+     x3 = this->cubicInterp(this->B, RYB_COLORS[3][1], RYB_COLORS[7][1]);
+     y0 = this->cubicInterp(this->G, x0, x1);
+     y1 = this->cubicInterp(this->G, x2, x3);
+
+    this->G = this->cubicInterp(this->R, y0, y1);
+
+
+    x0 = this->cubicInterp(this->B, RYB_COLORS[0][2], RYB_COLORS[4][2]);
+    x1 = this->cubicInterp(this->B, RYB_COLORS[1][2], RYB_COLORS[5][2]);
+    x2 = this->cubicInterp(this->B, RYB_COLORS[2][2], RYB_COLORS[6][2]);
+    x3 = this->cubicInterp(this->B, RYB_COLORS[3][2], RYB_COLORS[7][2]);
+    y0 = this->cubicInterp(this->G, x0, x1);
+    y1 = this->cubicInterp(this->G, x2, x3);
+
+    this->B = this->cubicInterp(this->R, y0, y1);
+
+}
+
+float Festivalle21AudioProcessor::cubicInterp(float t, float A, float B)
+{
+    float w = t * t * (3.0f - 2.0f * t);
+
+    return A + w * (B - A);
 }
