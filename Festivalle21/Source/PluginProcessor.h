@@ -83,15 +83,12 @@ private:
     juce::AudioBuffer<float> bufferToFill;
     int bufferToFillSampleIdx;
     juce::OSCSender sender;
-    bool connected;         // True if the OSC port is valid (< 65536)
+    bool connected;         // True if the OSC port is valid (!= 0 || < 65536)
     juce::String oscIpAddress;
     int oscPort;
 
     float avgValence;
     float avgArousal;
-    float R;
-    float G;
-    float B;
 
     float RYB_COLORS[8][3] = { 
         {1.0, 1.0, 1.0},
@@ -106,9 +103,9 @@ private:
 
     //==============================================================================
     std::vector<float> predictAV(juce::AudioBuffer<float> buffer);
-    void calculateRGB();
+    std::vector<float> calculateRGB(float valence, float arousal, float rms);
     void averageAV(std::vector<std::vector<float>>);
     void connectToOsc();
-    void ryb2RGB(float r, float y, float b);
+    std::vector<float> ryb2RGB(float r, float y, float b);
     float cubicInterp(float t, float A, float B);
 };

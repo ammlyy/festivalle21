@@ -18,13 +18,16 @@ void draw() {
 void oscEvent(OscMessage msg) {
   /* print the address pattern and the typetag of the received OscMessage */
   if(msg.checkAddrPattern("/juce/RGB")==true) {
-      R = msg.get(0).floatValue();  
-      G = msg.get(1).floatValue();  
-      B = msg.get(2).floatValue();  
+    R = msg.get(0).floatValue();  
+    G = msg.get(1).floatValue();  
+    B = msg.get(2).floatValue();  
 
-      print("### received an osc message /test with typetag ifs.");
-      println(" values: "+R+" "+G+" "+B+" ");
-      return;
+    println(" R: "+R+" G: "+G+" B: "+B+" ");
+    return;
+  }
+  else if(msg.checkAddrPattern("/juce/RMS")==true) {
+    println("RMS: " + msg.get(0).floatValue());
+    return;
   }
 
 }
