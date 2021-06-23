@@ -38,9 +38,6 @@ Festivalle21AudioProcessor::Festivalle21AudioProcessor()
 
     this->avgArousal = 0;
     this->avgValence = 0;
-    this->R = 0;
-    this->G = 0;
-    this->B = 0;
 
     this->oscIpAddress = "127.0.0.1";
     this->oscPort = 5005;
@@ -225,17 +222,17 @@ void Festivalle21AudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, 
 #endif
 
                 this->rms = this->bufferToFill.getRMSLevel(0, 0, BUFFER_SIZE);
-                //this->rms = max(20 * log(this->rms / 20), -100.f);               //convert to dB
                 this->rms = max(20 * log(this->rms / 20) / 2, -100.f);               //convert to dB
-                DBG(this->rms);
 
-                this->calculateRGB();
-                sender.send("/juce/RGB", juce::OSCArgument(this->R), juce::OSCArgument(this->G), juce::OSCArgument(this->B));
-
+                std::vector<float> msg = this->calculateRGB(this->avgValence, this->avgArousal, this->rms);
+                sender.send("/juce/RGB", juce::OSCArgument(msg[0]), juce::OSCArgument(msg[1]), juce::OSCArgument(msg[2]));
 
                 this->currentAVindex++;
                 if (this->currentAVindex == COLOR_FREQUENCY) {
                     this->averageAV(this->av);
+                    //std::vector<float> msg = this->calculateRGB(this->avgValence, this->avgArousal);
+                    // create and send an OSC message with an address and a float value:
+                    //sender.send("/juce/RGB", juce::OSCArgument(msg[0]), juce::OSCArgument(msg[1]), juce::OSCArgument(msg[2]));
                     this->currentAVindex = 0;
                 }
             }
@@ -299,6 +296,7 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
     return new Festivalle21AudioProcessor();
 }
 
+// Predict Valence and Arousal of the buffer and returns them as std::vector (size 2)
 std::vector<float> Festivalle21AudioProcessor::predictAV(juce::AudioBuffer<float> buffer)
 {
     std::vector<float> my_vector{ buffer.getReadPointer(0), buffer.getReadPointer(0) + BUFFER_SIZE };
@@ -309,65 +307,7 @@ std::vector<float> Festivalle21AudioProcessor::predictAV(juce::AudioBuffer<float
     return result[0].to_vector();
 }
 
-void Festivalle21AudioProcessor::calculateRGB()
-{
-    float H = (atan2(this->avgValence, this->avgArousal) * 180.0 / PI) + 30;    // Hue
-    if (H < 0) {
-        H = 360.0 + H;
-    }
-    DBG("H: " + to_string(H));
-    float S = min(sqrt(pow(this->avgValence, 2) + pow(this->avgArousal, 2)), 1.0);    // Saturation (distance)
-    float V = 1.0 + this->rms / 100;  //Intensity
-
-    float C = V * S;
-    float X = C * (1.0 - std::abs(std::fmod((H / 60.0), 2.0) - 1.0));
-    float m = V - C;
-
-    if (H >= 0 && H < 60) {
-        this->R = C;
-        this->G = X;
-        this->B = 0;
-    }
-    else if (H >= 60 && H < 120) {
-        this->R = X;
-        this->G = C;
-        this->B = 0;
-    }
-    else if (H >= 120 && H < 180) {
-        this->R = 0;
-        this->G = C;
-        this->B = X;
-    }
-    else if (H >= 180 && H < 240) {
-        this->R = 0;
-        this->G = X;
-        this->B = C;
-    }
-    else if (H >= 240 && H < 300) {
-        this->R = X;
-        this->G = 0;
-        this->B = C;
-    }
-    else if (H >= 300 && H <= 360) {
-        this->R = C;
-        this->G = 0;
-        this->B = X;
-    }
-
-    this->R = (this->R + m);
-    this->G = (this->G + m);
-    this->B = (this->B + m);
-
-    ryb2RGB(this->R, this->G, this->B);
-    this->R *= 255.0f;
-    this->G *= 255.0f;
-    this->B *= 255.0f;
-
-    DBG("R: " + to_string(this->R));
-    DBG("G: " + to_string(this->G));
-    DBG("B: " + to_string(this->B));
-}
-
+// Calculate the average Valence and Arousal (from the av vector) and store them in the attributes 
 void Festivalle21AudioProcessor::averageAV(std::vector<std::vector<float>> av)
 {
     float avg_valence = 0.0f;
@@ -384,16 +324,85 @@ void Festivalle21AudioProcessor::averageAV(std::vector<std::vector<float>> av)
     this->avgArousal = min(1.f, avg_arousal * SCALING_FACTOR);
 }
 
+// Calculate RGB values corresponding to the point defined by valence and arousal and returns them as std::vector (size 3)
+std::vector<float> Festivalle21AudioProcessor::calculateRGB(float valence, float arousal, float rms)
+{
+    float R = 0.0f;
+    float Y = 0.0f;
+    float B = 0.0f;
+
+    float H = (atan2(valence, arousal) * 180.0 / PI) + 30;    // Hue
+    if (H < 0) {
+        H = 360.0 + H;
+    }
+    DBG("H: " + to_string(H));
+    float S = min(sqrt(pow(valence, 2) + pow(arousal, 2)), 1.0);    // Saturation (distance)
+    float V = 1.0 + rms / 100.0;  //Intensity
+
+    float C = V * S;
+    float X = C * (1.0 - std::abs(std::fmod((H / 60.0), 2.0) - 1.0));
+    float m = V - C;
+
+    if (H >= 0 && H < 60) {
+        R = C;
+        Y = X;
+        B = 0;
+    }
+    else if (H >= 60 && H < 120) {
+        R = X;
+        Y = C;
+        B = 0;
+    }
+    else if (H >= 120 && H < 180) {
+        R = 0;
+        Y = C;
+        B = X;
+    }
+    else if (H >= 180 && H < 240) {
+        R = 0;
+        Y = X;
+        B = C;
+    }
+    else if (H >= 240 && H < 300) {
+        R = X;
+        Y = 0;
+        B = C;
+    }
+    else if (H >= 300 && H <= 360) {
+        R = C;
+        Y = 0;
+        B = X;
+    }
+
+    R = (R + m);
+    Y = (Y + m);
+    B = (B + m);
+
+    std::vector<float> rgbValues = ryb2RGB(R, Y, B);
+    for (auto &el : rgbValues) {
+        el *= 255.0f;
+    }
+
+    DBG("R: " + to_string(rgbValues[0]));
+    DBG("G: " + to_string(rgbValues[1]));
+    DBG("B: " + to_string(rgbValues[2]));
+
+    return rgbValues;
+}
+
 void Festivalle21AudioProcessor::connectToOsc()
 {
     // specify here where to send OSC messages to: host URL and UDP port number
     sender.connect(this->oscIpAddress, this->oscPort);   // [4]
 
-    this->oscPort >= 65536 ? this->connected = false : this->connected = true;
+    (this->oscPort == 0 || this->oscPort >= 65536) ? this->connected = false : this->connected = true;
 }
 
-void Festivalle21AudioProcessor::ryb2RGB(float r, float y, float b)
+// Convert RYB values to RGB
+std::vector<float> Festivalle21AudioProcessor::ryb2RGB(float r, float y, float b)
 {
+    std::vector<float> rgb(3);
+
     float x0 = this->cubicInterp(b, RYB_COLORS[0][0], RYB_COLORS[4][0]);
     float x1 = this->cubicInterp(b, RYB_COLORS[1][0], RYB_COLORS[5][0]);
     float x2 = this->cubicInterp(b, RYB_COLORS[2][0], RYB_COLORS[6][0]);
@@ -401,17 +410,16 @@ void Festivalle21AudioProcessor::ryb2RGB(float r, float y, float b)
     float y0 = this->cubicInterp(y, x0, x1);
     float y1 = this->cubicInterp(y, x2, x3);
 
-    this->R = this->cubicInterp(r, y0, y1);
+    rgb[0] = this->cubicInterp(r, y0, y1);
 
-     x0 = this->cubicInterp(b, RYB_COLORS[0][1], RYB_COLORS[4][1]);
-     x1 = this->cubicInterp(b, RYB_COLORS[1][1], RYB_COLORS[5][1]);
-     x2 = this->cubicInterp(b, RYB_COLORS[2][1], RYB_COLORS[6][1]);
-     x3 = this->cubicInterp(b, RYB_COLORS[3][1], RYB_COLORS[7][1]);
-     y0 = this->cubicInterp(y, x0, x1);
-     y1 = this->cubicInterp(y, x2, x3);
+    x0 = this->cubicInterp(b, RYB_COLORS[0][1], RYB_COLORS[4][1]);
+    x1 = this->cubicInterp(b, RYB_COLORS[1][1], RYB_COLORS[5][1]);
+    x2 = this->cubicInterp(b, RYB_COLORS[2][1], RYB_COLORS[6][1]);
+    x3 = this->cubicInterp(b, RYB_COLORS[3][1], RYB_COLORS[7][1]);
+    y0 = this->cubicInterp(y, x0, x1);
+    y1 = this->cubicInterp(y, x2, x3);
 
-    this->G = this->cubicInterp(r, y0, y1);
-
+    rgb[1] = this->cubicInterp(r, y0, y1);
 
     x0 = this->cubicInterp(b, RYB_COLORS[0][2], RYB_COLORS[4][2]);
     x1 = this->cubicInterp(b, RYB_COLORS[1][2], RYB_COLORS[5][2]);
@@ -420,8 +428,9 @@ void Festivalle21AudioProcessor::ryb2RGB(float r, float y, float b)
     y0 = this->cubicInterp(y, x0, x1);
     y1 = this->cubicInterp(y, x2, x3);
 
-    this->B = this->cubicInterp(r, y0, y1);
+    rgb[2] = this->cubicInterp(r, y0, y1);
 
+    return rgb;
 }
 
 float Festivalle21AudioProcessor::cubicInterp(float t, float A, float B)
