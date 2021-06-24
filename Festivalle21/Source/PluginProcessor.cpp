@@ -337,7 +337,7 @@ std::vector<float> Festivalle21AudioProcessor::calculateRGB(float valence, float
     }
     DBG("H: " + to_string(H));
     float S = min(sqrt(pow(valence, 2) + pow(arousal, 2)), 1.0);    // Saturation (distance)
-    float V = 0.0;  //Intensity
+    float V = 0.5;  //Intensity
 
     float C = V * S;
     float X = C * (1.0 - std::abs(std::fmod((H / 60.0), 2.0) - 1.0));

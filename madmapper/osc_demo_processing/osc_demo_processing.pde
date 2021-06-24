@@ -5,6 +5,7 @@ import netP5.*;
 OscP5 osc;
 NetAddress remoteLocation;
 float R, G, B = 0.0;
+float V, A = 0.0;
 void setup() {
   size(200,200);
   osc = new OscP5(this, 5005);
@@ -23,6 +24,13 @@ void oscEvent(OscMessage msg) {
     B = msg.get(2).floatValue();  
 
     println(" R: "+R+" G: "+G+" B: "+B+" ");
+    return;
+  }  
+  if(msg.checkAddrPattern("/juce/VA")==true) {
+    V = msg.get(0).floatValue();  
+    A = msg.get(1).floatValue();   
+
+    println(" Valence: "+V+" Arousal: "+A+" ");
     return;
   }
   else if(msg.checkAddrPattern("/juce/brightness")==true) {
