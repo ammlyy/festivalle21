@@ -1,5 +1,8 @@
 # Festivalle21
 
+## [Documentation](https://github.com/ammlyy/festivalle21/wiki)
+
+## About
 This is the codebase for our project on stage lighting control based on MER (Music emotion recognition), subdivided in:
 * [Python scripts](https://github.com/ammlyy/festivalle21/tree/main/py)
 * [Madmapper projects](https://github.com/ammlyy/festivalle21/tree/main/madmapper)
