@@ -223,16 +223,16 @@ void Festivalle21AudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, 
 
                 this->rms = this->bufferToFill.getRMSLevel(0, 0, BUFFER_SIZE);
                 this->rms = max(20 * log(this->rms / 20) / 2, -100.f);               //convert to dB
+                float brightness = 1.0 + this->rms;
 
-                std::vector<float> msg = this->calculateRGB(this->avgValence, this->avgArousal, this->rms);
-                sender.send("/juce/RGB", juce::OSCArgument(msg[0]), juce::OSCArgument(msg[1]), juce::OSCArgument(msg[2]));
+                sender.send("/juce/brightness", juce::OSCArgument(brightness));
 
                 this->currentAVindex++;
                 if (this->currentAVindex == COLOR_FREQUENCY) {
                     this->averageAV(this->av);
-                    //std::vector<float> msg = this->calculateRGB(this->avgValence, this->avgArousal);
+                    std::vector<float> msg = this->calculateRGB(this->avgValence, this->avgArousal);
                     // create and send an OSC message with an address and a float value:
-                    //sender.send("/juce/RGB", juce::OSCArgument(msg[0]), juce::OSCArgument(msg[1]), juce::OSCArgument(msg[2]));
+                    sender.send("/juce/RGB", juce::OSCArgument(msg[0]), juce::OSCArgument(msg[1]), juce::OSCArgument(msg[2]));
                     this->currentAVindex = 0;
                 }
             }
@@ -325,7 +325,7 @@ void Festivalle21AudioProcessor::averageAV(std::vector<std::vector<float>> av)
 }
 
 // Calculate RGB values corresponding to the point defined by valence and arousal and returns them as std::vector (size 3)
-std::vector<float> Festivalle21AudioProcessor::calculateRGB(float valence, float arousal, float rms)
+std::vector<float> Festivalle21AudioProcessor::calculateRGB(float valence, float arousal)
 {
     float R = 0.0f;
     float Y = 0.0f;
@@ -337,7 +337,7 @@ std::vector<float> Festivalle21AudioProcessor::calculateRGB(float valence, float
     }
     DBG("H: " + to_string(H));
     float S = min(sqrt(pow(valence, 2) + pow(arousal, 2)), 1.0);    // Saturation (distance)
-    float V = 1.0 + rms / 100.0;  //Intensity
+    float V = 1.0;  //Intensity
 
     float C = V * S;
     float X = C * (1.0 - std::abs(std::fmod((H / 60.0), 2.0) - 1.0));

@@ -15,13 +15,11 @@
 #define PI 3.14159265
 #define BUFFER_SIZE 22050 //500 ms at 44.1kHz
 
-#define COLOR_FREQUENCY 4 // number of 500ms windows analyzed before sending a color change (3seconds)
+#define COLOR_FREQUENCY 4 // number of 500ms windows analyzed before sending a color change (2seconds)
 #define SCENE_SELECTOR 20 // number of 500ms windows analyzed before sending a Scene triger (10seconds)
 //#define MEASURE_TIME 0  // comment this line not to measure prediction time
 #define SCALING_FACTOR 3
 
-//#define PATH_TO_JSON = "D:\\GitHub\\festivalle21\\Festivalle21\\Source\\models\\exported\\pred_model.json";
-//#define PATH_TO_JSON = "C:\\Users\\amere\\source\\Repos\\festivalle21\\Festivalle21\\Source\\models\\exported\\exported_model.json"
 //==============================================================================
 /**
 */
@@ -73,13 +71,13 @@ private:
 #ifdef MEASURE_TIME
     std::ofstream myfile;
 #endif
-
+    const std::string pathToModel = "";     //Insert here the path to model.json
     double sampleRate;
     double samplesPerBlock;
     std::vector<std::vector<float>> av;
     float rms;
     int currentAVindex;
-    fdeep::model model = fdeep::load_model("C:\\Users\\gabri\\festivalle21\\Festivalle21\\Source\\models\\exported\\exported_model.json");
+    fdeep::model model = fdeep::load_model(this->pathToModel);
     juce::AudioBuffer<float> bufferToFill;
     int bufferToFillSampleIdx;
     juce::OSCSender sender;
@@ -103,7 +101,7 @@ private:
 
     //==============================================================================
     std::vector<float> predictAV(juce::AudioBuffer<float> buffer);
-    std::vector<float> calculateRGB(float valence, float arousal, float rms);
+    std::vector<float> calculateRGB(float valence, float arousal);
     void averageAV(std::vector<std::vector<float>>);
     void connectToOsc();
     std::vector<float> ryb2RGB(float r, float y, float b);

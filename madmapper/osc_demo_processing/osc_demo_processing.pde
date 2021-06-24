@@ -25,7 +25,7 @@ void oscEvent(OscMessage msg) {
     println(" R: "+R+" G: "+G+" B: "+B+" ");
     return;
   }
-  else if(msg.checkAddrPattern("/juce/RMS")==true) {
+  else if(msg.checkAddrPattern("/juce/brightness")==true) {
     println("RMS: " + msg.get(0).floatValue());
     return;
   }
