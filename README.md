@@ -1,7 +1,9 @@
 # festivalle21
-[references](https://docs.google.com/spreadsheets/d/1X7w7JsB0rjZ3-EeG_6_Ful0rDrcqozvxa9XFvPf4iBs/edit?usp=sharing)
 
-[colab for python](https://colab.research.google.com/drive/1vI6Xt8aWPvNIm9K4Ca6bUMTUN0HVk5jg?usp=sharing#scrollTo=rot7awsWYnFS)
+This is the codebase for our project on stage lighting control based on MER (Music emotion recognition), subdivided in:
+* [python scripts](https://github.com/ammlyy/festivalle21/tree/main/py)
+* [madmapper projects](https://github.com/ammlyy/festivalle21/tree/main/madmapper)
+* [JUCE project](https://github.com/ammlyy/festivalle21/tree/main/Festivalle21)
 
 
 # Setup
