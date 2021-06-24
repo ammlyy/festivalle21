@@ -5,6 +5,8 @@ This is the codebase for our project on stage lighting control based on MER (Mus
 * [madmapper projects](https://github.com/ammlyy/festivalle21/tree/main/madmapper)
 * [JUCE project](https://github.com/ammlyy/festivalle21/tree/main/Festivalle21)
 
+Check out our [docs](https://github.com/ammlyy/festivalle21/wiki) or explore directly the code using the above links. 
+
 
 # Setup
 Install [Frugally-Deep](https://github.com/Dobiasd/frugally-deep) and point to it in the jucer exporters and project settings Header search paths, on Win we recommend using the [vcpkg utility](https://github.com/microsoft/vcpkg) following [these steps](https://github.com/microsoft/vcpkg#getting-started) and then pointing in the jucer to vcpkg's **include** subdirectory created.
