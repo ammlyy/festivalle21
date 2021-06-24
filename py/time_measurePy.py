@@ -13,6 +13,9 @@ print(X_test.shape)
 
 with open('timing_measurePython.txt', 'w') as f:
     for i in range(60):
+        buffer = X_test[i]
+        buffer = np.expand_dims(buffer, axis=0)
         start_time = time.perf_counter()
-        pred_model.predict(X_test[i])
+        pred_model.predict(buffer)
+
         f.write((str(time.perf_counter() - start_time) + '\n'))
