@@ -28,7 +28,8 @@ Festivalle21AudioProcessorEditor::Festivalle21AudioProcessorEditor (Festivalle21
     this->ipInput.setFont(juce::Font(20.0f));
     this->ipInput.setEditable(true, false, true);
     this->ipInput.setJustificationType(juce::Justification::centred);
-    this->ipInput.setSize(100, 30);
+    this->ipInput.setSize(150, 30);
+    this->ipInput.setColour(juce::Label::backgroundColourId, juce::Colours::darkgrey);
     this->ipInput.onTextChange = [this] {
         if(!this->audioProcessor.setIP(this->ipInput.getText()))
             this->ipInput.setText("Invalid IP address", juce::dontSendNotification);
@@ -44,8 +45,9 @@ Festivalle21AudioProcessorEditor::Festivalle21AudioProcessorEditor (Festivalle21
     this->portInput.setText("5005", juce::dontSendNotification);
     this->portInput.setFont(juce::Font(20.0f));
     this->portInput.setEditable(true);
-    this->portInput.setJustificationType(juce::Justification::left);
-    this->portInput.setSize(200, 30);
+    this->portInput.setJustificationType(juce::Justification::centred);
+    this->portInput.setSize(150, 30);
+    this->portInput.setColour(juce::Label::backgroundColourId, juce::Colours::darkgrey);
     this->portInput.onTextChange = [this] {
         if(!this->audioProcessor.setPort(this->portInput.getText()))
             this->portInput.setText("Invalid port", juce::dontSendNotification);
@@ -82,10 +84,11 @@ void Festivalle21AudioProcessorEditor::resized()
     this->colorwheel.setBounds(area.removeFromTop(400));
 
     auto labelsArea = area.removeFromTop(30);
+    labelsArea.removeFromLeft(30);
     this->ipLabel.setBounds(labelsArea.removeFromLeft(100));
-    this->ipInput.setBounds(labelsArea.removeFromLeft(100));
+    this->ipInput.setBounds(labelsArea.removeFromLeft(150));
     labelsArea.removeFromLeft(50);
     this->portLabel.setBounds(labelsArea.removeFromLeft(50));
-    this->portInput.setBounds(labelsArea.removeFromLeft(50));
+    this->portInput.setBounds(labelsArea.removeFromLeft(150));
 }
 
