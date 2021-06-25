@@ -21,4 +21,4 @@ On Windows we recommend using the [vcpkg utility](https://github.com/microsoft/v
   <img src="https://user-images.githubusercontent.com/37587013/123405938-a7b8e100-d5aa-11eb-849f-e83f9a69b0f4.png" width="50%"//>
 </p>
 
-The interface shows the color circle with a point corresponding to the color that will be sent through OSC. Below it is possible to change the IP Adress and the Port on which messages are sent. To ensure a communication between the plugin and the reciever make sure the IP Adress and Port corresponds.
+The interface shows the color circle with a point corresponding to the color that will be sent through OSC. Below it is possible to change the IP Adress and the Port on which messages are sent. To ensure a communication between the plugin and the receiver make sure the IP Adress and Port corresponds.
