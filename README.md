@@ -1,5 +1,9 @@
 # Festivalle21
 
+This repository contains all the code we used to develop our stage lighting control system.
+The project was developed for the "Project Course" at Politecnico of Milan in collaboration with Festivalle, a jazz festival in the Valle dei Templi in Agrigento (Sicily).
+We aimed at automating the process of controlling the color of a light system by mean of a neural network able to predict valence and arousal, two values used in the Russell's model of affect to describe emotions. 
+The network is built inside a VST built in JUCE, that is fed with raw audio. It segments the stream in windows of 500ms, performs the prediction and outputs two values that are mapped to a RGB color and finally sent through OSC protocol to Madmapper. Madmapper then maps the color messages to lights through the DMX protocol.
 ## [Documentation](https://github.com/ammlyy/festivalle21/wiki)
 
 ## About
