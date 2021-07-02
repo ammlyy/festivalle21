@@ -71,7 +71,7 @@ private:
 #ifdef MEASURE_TIME
     std::ofstream myfile;
 #endif
-    const std::string pathToModel = "";     //Insert here the path to model.json
+    const std::string pathToModel = "C:\\Users\\gabri\\festivalle21\\Festivalle21\\Source\\models\\exported\\exported_model.json";     //Insert here the path to model.json
     double sampleRate;
     double samplesPerBlock;
     std::vector<std::vector<float>> av;
