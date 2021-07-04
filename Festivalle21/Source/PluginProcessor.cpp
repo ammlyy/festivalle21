@@ -222,7 +222,7 @@ void Festivalle21AudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, 
 #endif
 
                 this->rms = this->bufferToFill.getRMSLevel(0, 0, BUFFER_SIZE);
-                this->rms = max(20 * log(this->rms) / 2, -100.f);               //convert to dB
+                this->rms = max((20 * log(this->rms) / 2)/3, -100.f);               //convert to dB
                 float brightness = 1.0 + this->rms;
 
                 sender.send("/juce/brightness", juce::OSCArgument(brightness));
@@ -337,7 +337,7 @@ std::vector<float> Festivalle21AudioProcessor::calculateRGB(float valence, float
     }
     DBG("H: " + to_string(H));
     float S = min(sqrt(pow(valence, 2) + pow(arousal, 2)), 1.0);    // Saturation (distance)
-    float V = 1.0;  //Intensity
+    float V = 1;  //Intensity
 
     float C = V * S;
     float X = C * (1.0 - std::abs(std::fmod((H / 60.0), 2.0) - 1.0));
@@ -379,9 +379,9 @@ std::vector<float> Festivalle21AudioProcessor::calculateRGB(float valence, float
     B = (B + m);
 
     std::vector<float> rgbValues = ryb2RGB(R, Y, B);
-    for (auto &el : rgbValues) {
+    /*for (auto& el : rgbValues) {
         el *= 255.0f;
-    }
+    }*/
 
     DBG("R: " + to_string(rgbValues[0]));
     DBG("G: " + to_string(rgbValues[1]));
