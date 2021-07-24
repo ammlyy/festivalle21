@@ -17,6 +17,8 @@ ColorWheel::ColorWheel(int width, int height)
     this->wheelImage = juce::ImageCache::getFromMemory(BinaryData::COLOR_WHEEL_png, BinaryData::COLOR_WHEEL_pngSize);
     this->wheelImage = this->wheelImage.rescaled(getWidth() / 2.0, getWidth() / 2.0, juce::Graphics::highResamplingQuality);
 
+    this->rotationAngle = 0.0f;
+
 }
 
 ColorWheel::~ColorWheel()
@@ -53,12 +55,24 @@ void ColorWheel::drawPoint(juce::Graphics& g, std::vector<float> av)
 {
     const auto centre = getLocalBounds().toFloat().getCentre();
     float radius = getWidth() / 4.0;
+    auto abscissa = av[1] * radius;
+    auto ordinate = -1.0f * av[0] * radius;
+    float newAbscissa = abscissa * cos(rotationAngle * PI / 180.0) + ordinate * sin(rotationAngle * PI / 180.0);
+    float newOrdinate = ordinate * sin(rotationAngle * PI / 180.0) - abscissa * cos(rotationAngle * PI / 180.0);
+    newAbscissa += centre.x;
+    newOrdinate += centre.y;
     g.setColour(juce::Colours::darkgrey);
-    g.drawEllipse(centre.x + av[1] * radius, centre.y - av[0] * radius, 5.f, 5.f, 5.f);
+    g.drawEllipse(newAbscissa, newOrdinate, 5.f, 5.f, 5.f);
 
 }
 
 void ColorWheel::setAV(std::vector<float> av)
 {
     this->av = av;
+}
+
+void ColorWheel::sliderValueChanged(juce::Slider* slider)
+{
+    this->rotationAngle = slider->getValue();
+    //DBG(slider->getValue());
 }

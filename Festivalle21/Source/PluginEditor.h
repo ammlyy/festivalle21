@@ -11,6 +11,7 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "ColorWheel.h"
+#include "MyKnob.h"
 
 //==============================================================================
 /**
@@ -35,6 +36,10 @@ private:
     juce::Label portInput;
     juce::Label ipLabel;
     juce::Label ipInput;
+
+    MyKnob rotationSlider;
+
+    juce::AudioProcessorValueTreeState* valueTreeState;
 
     //JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Festivalle21AudioProcessorEditor)
 };

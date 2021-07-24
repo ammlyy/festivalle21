@@ -23,6 +23,11 @@ Festivalle21AudioProcessor::Festivalle21AudioProcessor()
 #endif
     )
 #endif
+    ,
+    treeState(*this, nullptr, juce::Identifier("CURRENT_STATE"),
+        {
+        std::make_unique<juce::AudioParameterFloat>("rotationAngle", "RotationAngle", 0.0f, 360.0f, 0.0f), // id, name, min,max, initial value
+})
 {
 #ifdef MEASURE_TIME
     this->myfile.open("timing_measure.txt");
@@ -289,6 +294,11 @@ bool Festivalle21AudioProcessor::setPort(juce::String port)
     return this->connected;
 }
 
+juce::AudioProcessorValueTreeState* Festivalle21AudioProcessor::getValueTreeState()
+{
+    return &treeState;
+}
+
 //==============================================================================
 // This creates new instances of the plugin..
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
@@ -320,8 +330,14 @@ void Festivalle21AudioProcessor::averageAV(std::vector<std::vector<float>> av)
     avg_valence /= av.size();
     avg_arousal /= av.size();
 
-    this->avgValence = min(1.f, avg_valence * SCALING_FACTOR);
-    this->avgArousal = min(1.f, avg_arousal * SCALING_FACTOR);
+    float rotationAngle = *treeState.getRawParameterValue("rotationAngle");
+    float newAvgVal = avg_valence * cos(rotationAngle * PI / 180.0) + avg_arousal * sin(rotationAngle * PI / 180.0);
+    float newAvgArous = avg_arousal * sin(rotationAngle * PI / 180.0) - avg_valence * cos(rotationAngle * PI / 180.0);
+
+    this->avgValence = min(1.f, newAvgVal * SCALING_FACTOR);
+    this->avgArousal = min(1.f, newAvgArous * SCALING_FACTOR);
+
+    
 }
 
 // Calculate RGB values corresponding to the point defined by valence and arousal and returns them as std::vector (size 3)

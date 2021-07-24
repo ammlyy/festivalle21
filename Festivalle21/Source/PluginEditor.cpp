@@ -10,7 +10,7 @@
 #include "PluginEditor.h"
 //==============================================================================
 Festivalle21AudioProcessorEditor::Festivalle21AudioProcessorEditor (Festivalle21AudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p)
+    : AudioProcessorEditor (&p), audioProcessor (p), valueTreeState(p.getValueTreeState())
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
@@ -55,6 +55,12 @@ Festivalle21AudioProcessorEditor::Festivalle21AudioProcessorEditor (Festivalle21
     addAndMakeVisible(this->portInput);
 
     setResizable(false, false);
+
+    this->rotationSlider.setAttachment(*valueTreeState, "rotationAngle");
+    this->rotationSlider.setSize(300, 20);
+    this->rotationSlider.addListener(&this->colorwheel);
+    addAndMakeVisible(this->rotationSlider);
+
 }
 
 Festivalle21AudioProcessorEditor::~Festivalle21AudioProcessorEditor()

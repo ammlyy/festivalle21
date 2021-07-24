@@ -1,7 +1,9 @@
 #pragma once
 #include <JuceHeader.h>
 
-class ColorWheel : public juce::Component {
+#define PI 3.14159265
+
+class ColorWheel : public juce::Component, public juce::Slider::Listener {
 public:
 
     ColorWheel(int width, int height);
@@ -13,9 +15,13 @@ public:
     void drawPoint(juce::Graphics& g, std::vector<float> av);
     void setAV(std::vector<float> av);
 
+    void sliderValueChanged(juce::Slider* slider) override;
+
 
 private:
     juce::Image wheelImage;
     std::vector<float> av;
+
+    float rotationAngle;
 
 };
