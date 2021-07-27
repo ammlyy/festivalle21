@@ -69,7 +69,7 @@ Festivalle21AudioProcessorEditor::~Festivalle21AudioProcessorEditor()
 
 void Festivalle21AudioProcessorEditor::timerCallback()
 {
-    this->colorwheel.setAV(this->audioProcessor.getAV());
+    this->colorwheel.setAV(this->audioProcessor.getAverageAV());
     this->repaint();
 }
 //==============================================================================

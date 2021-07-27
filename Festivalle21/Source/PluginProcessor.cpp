@@ -273,7 +273,7 @@ void Festivalle21AudioProcessor::setStateInformation(const void* data, int sizeI
     // whose contents will have been created by the getStateInformation() call.
 }
 
-std::vector<float> Festivalle21AudioProcessor::getAV()
+std::vector<float> Festivalle21AudioProcessor::getAverageAV()
 {
     std::vector<float> avgVec = { this->avgArousal, this->avgValence };
     return avgVec;
@@ -331,8 +331,8 @@ void Festivalle21AudioProcessor::averageAV(std::vector<std::vector<float>> av)
     avg_arousal /= av.size();
 
     float rotationAngle = *treeState.getRawParameterValue("rotationAngle");
-    float newAvgVal = avg_valence * cos(rotationAngle * PI / 180.0) + avg_arousal * sin(rotationAngle * PI / 180.0);
-    float newAvgArous = avg_arousal * sin(rotationAngle * PI / 180.0) - avg_valence * cos(rotationAngle * PI / 180.0);
+    float newAvgVal = avg_valence * cos(rotationAngle * PI / 180.0) - avg_arousal * sin(rotationAngle * PI / 180.0);
+    float newAvgArous = avg_valence * sin(rotationAngle * PI / 180.0) + avg_arousal * cos(rotationAngle * PI / 180.0);
 
     this->avgValence = min(1.f, newAvgVal * SCALING_FACTOR);
     this->avgArousal = min(1.f, newAvgArous * SCALING_FACTOR);
@@ -352,7 +352,7 @@ std::vector<float> Festivalle21AudioProcessor::calculateRGB(float valence, float
         H = 360.0 + H;
     }
     DBG("H: " + to_string(H));
-    float S = min(sqrt(pow(valence, 2) + pow(arousal, 2)), 1.0);    // Saturation (distance)
+    float S = min(max(sqrt(pow(valence, 2) + pow(arousal, 2)), 0.6), 1.0);    // Saturation (distance)
     float V = 1;  //Intensity
 
     float C = V * S;

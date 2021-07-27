@@ -62,7 +62,7 @@ public:
     //==============================================================================
     void getStateInformation(juce::MemoryBlock& destData) override;
     void setStateInformation(const void* data, int sizeInBytes) override;
-    std::vector<float> getAV();
+    std::vector<float> getAverageAV();
     bool setIP(juce::String ipAddress);
     bool setPort(juce::String port);
 
@@ -74,7 +74,7 @@ private:
     std::ofstream myfile;
 #endif
     juce::AudioProcessorValueTreeState treeState;
-    const std::string pathToModel = "D:\\GitHub\\festivalle21\\Festivalle21\\Source\\models\\exported\\exported_model.json";     //Insert here the path to model.json
+    const std::string pathToModel = "";     //Insert here the path to model.json
     double sampleRate;
     double samplesPerBlock;
     std::vector<std::vector<float>> av;

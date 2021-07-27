@@ -57,12 +57,10 @@ void ColorWheel::drawPoint(juce::Graphics& g, std::vector<float> av)
     float radius = getWidth() / 4.0;
     auto abscissa = av[1] * radius;
     auto ordinate = -1.0f * av[0] * radius;
-    float newAbscissa = abscissa * cos(rotationAngle * PI / 180.0) + ordinate * sin(rotationAngle * PI / 180.0);
-    float newOrdinate = ordinate * sin(rotationAngle * PI / 180.0) - abscissa * cos(rotationAngle * PI / 180.0);
-    newAbscissa += centre.x;
-    newOrdinate += centre.y;
+    abscissa += centre.x;
+    ordinate += centre.y;
     g.setColour(juce::Colours::darkgrey);
-    g.drawEllipse(newAbscissa, newOrdinate, 5.f, 5.f, 5.f);
+    g.drawEllipse(abscissa, ordinate, 5.f, 5.f, 5.f);
 
 }
 
