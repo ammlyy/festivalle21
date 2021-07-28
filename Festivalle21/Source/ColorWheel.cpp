@@ -17,8 +17,6 @@ ColorWheel::ColorWheel(int width, int height)
     this->wheelImage = juce::ImageCache::getFromMemory(BinaryData::COLOR_WHEEL_png, BinaryData::COLOR_WHEEL_pngSize);
     this->wheelImage = this->wheelImage.rescaled(getWidth() / 2.0, getWidth() / 2.0, juce::Graphics::highResamplingQuality);
 
-    this->rotationAngle = 0.0f;
-
 }
 
 ColorWheel::~ColorWheel()
@@ -69,8 +67,3 @@ void ColorWheel::setAV(std::vector<float> av)
     this->av = av;
 }
 
-void ColorWheel::sliderValueChanged(juce::Slider* slider)
-{
-    this->rotationAngle = slider->getValue();
-    //DBG(slider->getValue());
-}

@@ -3,7 +3,7 @@
 
 #define PI 3.14159265
 
-class ColorWheel : public juce::Component, public juce::Slider::Listener {
+class ColorWheel : public juce::Component{
 public:
 
     ColorWheel(int width, int height);
@@ -14,8 +14,6 @@ public:
 
     void drawPoint(juce::Graphics& g, std::vector<float> av);
     void setAV(std::vector<float> av);
-
-    void sliderValueChanged(juce::Slider* slider) override;
 
 
 private:

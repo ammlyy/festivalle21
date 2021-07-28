@@ -27,6 +27,8 @@ Festivalle21AudioProcessor::Festivalle21AudioProcessor()
     treeState(*this, nullptr, juce::Identifier("CURRENT_STATE"),
         {
         std::make_unique<juce::AudioParameterFloat>("rotationAngle", "RotationAngle", 0.0f, 360.0f, 0.0f), // id, name, min,max, initial value
+        std::make_unique<juce::AudioParameterFloat>("manualRadius", "ManualRadius", 0.1f, 1.0f, 0.1f),
+        std::make_unique<juce::AudioParameterInt>("isManual", "IsManual", 0, 1, 0),
 })
 {
 #ifdef MEASURE_TIME
@@ -320,23 +322,31 @@ std::vector<float> Festivalle21AudioProcessor::predictAV(juce::AudioBuffer<float
 // Calculate the average Valence and Arousal (from the av vector) and store them in the attributes 
 void Festivalle21AudioProcessor::averageAV(std::vector<std::vector<float>> av)
 {
+    int strategy = *treeState.getRawParameterValue("isManual");
     float avg_valence = 0.0f;
     float avg_arousal = 0.0f;
 
-    for (int i = 0; i < COLOR_FREQUENCY; i++) {
-        avg_valence += av[i][1];
-        avg_arousal += av[i][0];
+    if (!strategy) {
+        for (int i = 0; i < COLOR_FREQUENCY; i++) {
+            avg_valence += av[i][1];
+            avg_arousal += av[i][0];
+        }
+        avg_valence /= av.size();
+        avg_arousal /= av.size();
+
+        float rotationAngle = *treeState.getRawParameterValue("rotationAngle");
+        float newAvgVal = avg_valence * cos(rotationAngle * PI / 180.0) - avg_arousal * sin(rotationAngle * PI / 180.0);
+        float newAvgArous = avg_valence * sin(rotationAngle * PI / 180.0) + avg_arousal * cos(rotationAngle * PI / 180.0);
+
+        this->avgValence = min(1.f, newAvgVal * SCALING_FACTOR);
+        this->avgArousal = min(1.f, newAvgArous * SCALING_FACTOR);
     }
-    avg_valence /= av.size();
-    avg_arousal /= av.size();
-
-    float rotationAngle = *treeState.getRawParameterValue("rotationAngle");
-    float newAvgVal = avg_valence * cos(rotationAngle * PI / 180.0) - avg_arousal * sin(rotationAngle * PI / 180.0);
-    float newAvgArous = avg_valence * sin(rotationAngle * PI / 180.0) + avg_arousal * cos(rotationAngle * PI / 180.0);
-
-    this->avgValence = min(1.f, newAvgVal * SCALING_FACTOR);
-    this->avgArousal = min(1.f, newAvgArous * SCALING_FACTOR);
-
+    else {
+        float radius = *treeState.getRawParameterValue("manualRadius");
+        float angle = *treeState.getRawParameterValue("rotationAngle");
+        this->avgValence = radius * cos(angle * PI / 180.0);
+        this->avgArousal = radius * sin(angle * PI / 180.0);
+    }
     
 }
 

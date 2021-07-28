@@ -38,6 +38,9 @@ private:
     juce::Label ipInput;
 
     MyKnob rotationSlider;
+    MyKnob radiusSlider;
+    MyKnob toggleManual;
+
 
     juce::AudioProcessorValueTreeState* valueTreeState;
 

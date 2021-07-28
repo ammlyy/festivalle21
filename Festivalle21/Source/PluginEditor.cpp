@@ -58,9 +58,15 @@ Festivalle21AudioProcessorEditor::Festivalle21AudioProcessorEditor (Festivalle21
 
     this->rotationSlider.setAttachment(*valueTreeState, "rotationAngle");
     this->rotationSlider.setSize(300, 20);
-    this->rotationSlider.addListener(&this->colorwheel);
     addAndMakeVisible(this->rotationSlider);
 
+    this->radiusSlider.setAttachment(*valueTreeState, "manualRadius");
+    this->radiusSlider.setSize(300, 20);
+    addAndMakeVisible(this->radiusSlider);
+
+    this->toggleManual.setAttachment(*valueTreeState, "isManual");
+    this->toggleManual.setSize(300, 20);
+    addAndMakeVisible(this->toggleManual);
 }
 
 Festivalle21AudioProcessorEditor::~Festivalle21AudioProcessorEditor()
@@ -96,5 +102,7 @@ void Festivalle21AudioProcessorEditor::resized()
     labelsArea.removeFromLeft(50);
     this->portLabel.setBounds(labelsArea.removeFromLeft(50));
     this->portInput.setBounds(labelsArea.removeFromLeft(150));
+    this->radiusSlider.setBounds(area.removeFromLeft(getWidth() / 2));
+    this->toggleManual.setBounds(area.removeFromLeft(getWidth() / 4));
 }
 
