@@ -14,7 +14,7 @@ Festivalle21AudioProcessorEditor::Festivalle21AudioProcessorEditor (Festivalle21
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (600, 500);
+    setSize (600, 650);
     this->startTimerHz(60);
     addAndMakeVisible(this->colorwheel);
 
@@ -60,13 +60,35 @@ Festivalle21AudioProcessorEditor::Festivalle21AudioProcessorEditor (Festivalle21
     this->rotationSlider.setSize(300, 20);
     addAndMakeVisible(this->rotationSlider);
 
+    this->rotationLabel.setText("Rotation", juce::dontSendNotification);
+    this->rotationLabel.setFont(juce::Font(20.0f));
+    this->rotationLabel.setJustificationType(juce::Justification::centred);
+    this->rotationLabel.setSize(50, 30);
+    this->rotationLabel.attachToComponent(&this->rotationSlider, true);
+    addAndMakeVisible(this->rotationLabel);
+
     this->radiusSlider.setAttachment(*valueTreeState, "manualRadius");
     this->radiusSlider.setSize(300, 20);
     addAndMakeVisible(this->radiusSlider);
 
-    this->toggleManual.setAttachment(*valueTreeState, "isManual");
-    this->toggleManual.setSize(300, 20);
+    this->radiusLabel.setText("Radius", juce::dontSendNotification);
+    this->radiusLabel.setFont(juce::Font(20.0f));
+    this->radiusLabel.setJustificationType(juce::Justification::centred);
+    this->radiusLabel.setSize(50, 30);
+    this->radiusLabel.attachToComponent(&this->radiusSlider, true);
+    addAndMakeVisible(this->radiusLabel);
+
+    this->btnAttachment.reset(new juce::AudioProcessorValueTreeState::ButtonAttachment(*this->valueTreeState, "isManual", this->toggleManual));
+    this->toggleManual.setSize(30, 30);
     addAndMakeVisible(this->toggleManual);
+
+    this->manualLabel.setText("Manual", juce::dontSendNotification);
+    this->manualLabel.setFont(juce::Font(20.0f));
+    this->manualLabel.setJustificationType(juce::Justification::centred);
+    this->manualLabel.setSize(50, 30);
+    this->manualLabel.attachToComponent(&this->toggleManual, true);
+    addAndMakeVisible(this->manualLabel);
+
 }
 
 Festivalle21AudioProcessorEditor::~Festivalle21AudioProcessorEditor()
@@ -102,7 +124,14 @@ void Festivalle21AudioProcessorEditor::resized()
     labelsArea.removeFromLeft(50);
     this->portLabel.setBounds(labelsArea.removeFromLeft(50));
     this->portInput.setBounds(labelsArea.removeFromLeft(150));
-    this->radiusSlider.setBounds(area.removeFromLeft(getWidth() / 2));
-    this->toggleManual.setBounds(area.removeFromLeft(getWidth() / 4));
+
+    area.removeFromTop(50);
+    auto slidersArea = area.removeFromTop(40);
+    this->rotationSlider.setBounds(slidersArea.removeFromRight(400));
+    area.removeFromTop(10);
+    slidersArea = area.removeFromTop(40);
+    this->radiusSlider.setBounds(slidersArea.removeFromRight(400));
+    slidersArea = area.removeFromTop(30);
+    this->toggleManual.setBounds(slidersArea.removeFromRight(260));
 }
 

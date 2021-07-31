@@ -323,6 +323,7 @@ std::vector<float> Festivalle21AudioProcessor::predictAV(juce::AudioBuffer<float
 void Festivalle21AudioProcessor::averageAV(std::vector<std::vector<float>> av)
 {
     int strategy = *treeState.getRawParameterValue("isManual");
+    DBG(strategy);
     float avg_valence = 0.0f;
     float avg_arousal = 0.0f;
 

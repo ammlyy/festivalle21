@@ -74,7 +74,7 @@ private:
     std::ofstream myfile;
 #endif
     juce::AudioProcessorValueTreeState treeState;
-    const std::string pathToModel = "D:\\GitHub\\festivalle21\\Festivalle21\\Source\\models\\exported\\exported_model.json";     //Insert here the path to model.json
+    const std::string pathToModel = "\\festivalle21\\Festivalle21\\Source\\models\\exported\\exported_model.json";     //Insert here the path to model.json
     double sampleRate;
     double samplesPerBlock;
     std::vector<std::vector<float>> av;

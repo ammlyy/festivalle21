@@ -37,9 +37,14 @@ private:
     juce::Label ipLabel;
     juce::Label ipInput;
 
+    juce::Label radiusLabel;
+    juce::Label rotationLabel;
+    juce::Label manualLabel;
+
     MyKnob rotationSlider;
     MyKnob radiusSlider;
-    MyKnob toggleManual;
+    std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> btnAttachment;
+    juce::ToggleButton toggleManual;
 
 
     juce::AudioProcessorValueTreeState* valueTreeState;
