@@ -29,7 +29,8 @@ Festivalle21AudioProcessor::Festivalle21AudioProcessor()
         std::make_unique<juce::AudioParameterFloat>("rotationAngle", "RotationAngle", 0.0f, 360.0f, 0.0f), // id, name, min,max, initial value
         std::make_unique<juce::AudioParameterFloat>("manualRadius", "ManualRadius", 0.1f, 1.0f, 0.1f),
         std::make_unique<juce::AudioParameterInt>("isManual", "IsManual", 0, 1, 0),
-})
+        std::make_unique<juce::AudioParameterBool>("bypassRYB", "ByPassRYB", false),
+        })
 {
 #ifdef MEASURE_TIME
     this->myfile.open("timing_measure.txt");
@@ -228,18 +229,23 @@ void Festivalle21AudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, 
                 DBG(ms_double.count());
 #endif
 
+                /*
                 this->rms = this->bufferToFill.getRMSLevel(0, 0, BUFFER_SIZE);
                 this->rms = max((20 * log(this->rms) / 2)/3, -100.f);               //convert to dB
                 float brightness = 1.0 + this->rms;
-
+                
                 sender.send("/juce/brightness", juce::OSCArgument(brightness));
+                */
 
                 this->currentAVindex++;
                 if (this->currentAVindex == COLOR_FREQUENCY) {
                     this->averageAV(this->av);
                     std::vector<float> msg = this->calculateRGB(this->avgValence, this->avgArousal);
                     // create and send an OSC message with an address and a float value:
-                    sender.send("/juce/RGB", juce::OSCArgument(msg[0]), juce::OSCArgument(msg[1]), juce::OSCArgument(msg[2]));
+                    sender.send("/juce/RGB/R", juce::OSCArgument(msg[0]));
+                    sender.send("/juce/RGB/G", juce::OSCArgument(msg[1]));
+                    sender.send("/juce/RGB/B", juce::OSCArgument(msg[2]));
+                    
                     this->currentAVindex = 0;
                 }
             }
@@ -406,6 +412,7 @@ std::vector<float> Festivalle21AudioProcessor::calculateRGB(float valence, float
     B = (B + m);
 
     std::vector<float> rgbValues = ryb2RGB(R, Y, B);
+    *treeState.getRawParameterValue("bypassRYB") ? rgbValues = { R, Y, B } : rgbValues = ryb2RGB(R, Y, B);
     /*for (auto& el : rgbValues) {
         el *= 255.0f;
     }*/

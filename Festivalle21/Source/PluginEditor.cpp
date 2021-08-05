@@ -78,7 +78,7 @@ Festivalle21AudioProcessorEditor::Festivalle21AudioProcessorEditor (Festivalle21
     this->radiusLabel.attachToComponent(&this->radiusSlider, true);
     addAndMakeVisible(this->radiusLabel);
 
-    this->btnAttachment.reset(new juce::AudioProcessorValueTreeState::ButtonAttachment(*this->valueTreeState, "isManual", this->toggleManual));
+    this->isManualAttachment.reset(new juce::AudioProcessorValueTreeState::ButtonAttachment(*this->valueTreeState, "isManual", this->toggleManual));
     this->toggleManual.setSize(30, 30);
     addAndMakeVisible(this->toggleManual);
 
@@ -89,6 +89,17 @@ Festivalle21AudioProcessorEditor::Festivalle21AudioProcessorEditor (Festivalle21
     this->manualLabel.attachToComponent(&this->toggleManual, true);
     addAndMakeVisible(this->manualLabel);
 
+    // BYPASS RYB BUTTON
+    this->bypassRYBAttachment.reset(new juce::AudioProcessorValueTreeState::ButtonAttachment(*this->valueTreeState, "bypassRYB", this->bypassRYB));
+    this->toggleManual.setSize(30, 30);
+    addAndMakeVisible(this->bypassRYB);
+
+    this->bypassRYBLabel.setText("ByPassRYB", juce::dontSendNotification);
+    this->bypassRYBLabel.setFont(juce::Font(20.0f));
+    this->bypassRYBLabel.setJustificationType(juce::Justification::centred);
+    this->bypassRYBLabel.setSize(50, 30);
+    this->bypassRYBLabel.attachToComponent(&this->bypassRYB, true);
+    addAndMakeVisible(this->bypassRYBLabel);
 }
 
 Festivalle21AudioProcessorEditor::~Festivalle21AudioProcessorEditor()
@@ -132,6 +143,8 @@ void Festivalle21AudioProcessorEditor::resized()
     slidersArea = area.removeFromTop(40);
     this->radiusSlider.setBounds(slidersArea.removeFromRight(400));
     slidersArea = area.removeFromTop(30);
-    this->toggleManual.setBounds(slidersArea.removeFromRight(260));
+    this->bypassRYB.setBounds(slidersArea.removeFromRight(160));
+    this->toggleManual.setBounds(slidersArea.removeFromRight(200));
+    
 }
 

@@ -40,11 +40,14 @@ private:
     juce::Label radiusLabel;
     juce::Label rotationLabel;
     juce::Label manualLabel;
+    juce::Label bypassRYBLabel;
 
     MyKnob rotationSlider;
     MyKnob radiusSlider;
-    std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> btnAttachment;
+    std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> isManualAttachment;
+    std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> bypassRYBAttachment;
     juce::ToggleButton toggleManual;
+    juce::ToggleButton bypassRYB;
 
 
     juce::AudioProcessorValueTreeState* valueTreeState;
