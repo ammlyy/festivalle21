@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="DOHn4D" name="Festivalle21" projectType="audioplug" useAppConfig="0"
+<JUCERPROJECT id="DOHn4D" name="OSC_toolkit" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
               headerPath="C:\src\vcpkg\vcpkg\installed\x86-windows\include"
               pluginVST3Category="Analyzer,Fx">
-  <MAINGROUP id="o6mKob" name="Festivalle21">
+  <MAINGROUP id="o6mKob" name="OSC_toolkit">
     <GROUP id="{8919C6B9-B79B-DB30-D6F5-6F616A95C221}" name="Source">
       <GROUP id="{CFB456C6-DE13-4941-AC49-CB2725A3B2BC}" name="models">
         <GROUP id="{DF4530AE-42E0-6652-94F2-B0DB34D6719E}" name="exported">
