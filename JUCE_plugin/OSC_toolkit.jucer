@@ -6,6 +6,12 @@
               pluginVST3Category="Analyzer,Fx">
   <MAINGROUP id="o6mKob" name="OSC_toolkit">
     <GROUP id="{8919C6B9-B79B-DB30-D6F5-6F616A95C221}" name="Source">
+      <FILE id="lzLjW5" name="ArousalValenceStrategy.cpp" compile="1" resource="0"
+            file="Source/ArousalValenceStrategy.cpp"/>
+      <FILE id="tWoE07" name="ArousalValenceStrategy.h" compile="0" resource="0"
+            file="Source/ArousalValenceStrategy.h"/>
+      <FILE id="wtAONR" name="Strategy.cpp" compile="1" resource="0" file="Source/Strategy.cpp"/>
+      <FILE id="BlNEmY" name="Strategy.h" compile="0" resource="0" file="Source/Strategy.h"/>
       <GROUP id="{CFB456C6-DE13-4941-AC49-CB2725A3B2BC}" name="models">
         <GROUP id="{DF4530AE-42E0-6652-94F2-B0DB34D6719E}" name="exported">
           <FILE id="vhbrqc" name="exported_model.json" compile="0" resource="1"

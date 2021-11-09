@@ -11,6 +11,7 @@
 #include <JuceHeader.h>
 #include <fdeep/fdeep.hpp>
 #include <string>
+#include "ArousalValenceStrategy.h"
 
 #define PI 3.14159265
 #define BUFFER_SIZE 22050 //500 ms at 44.1kHz
@@ -73,23 +74,17 @@ private:
 #ifdef MEASURE_TIME
     std::ofstream myfile;
 #endif
+    ArousalValenceStrategy* AVStrategy;
+    Strategy* analisysStrategy;
     juce::AudioProcessorValueTreeState treeState;
-    const std::string pathToModel = "D:\\GitHub\\OSC_toolkit\\JUCE_plugin\\Source\\models\\exported\\exported_model.json";     //Insert here the path to model.json
     double sampleRate;
     double samplesPerBlock;
-    std::vector<std::vector<float>> av;
     float rms;
-    int currentAVindex;
-    fdeep::model model = fdeep::load_model(this->pathToModel);
-    juce::AudioBuffer<float> bufferToFill;
-    int bufferToFillSampleIdx;
     juce::OSCSender sender;
     bool connected;         // True if the OSC port is valid (!= 0 || < 65536)
     juce::String oscIpAddress;
     int oscPort;
 
-    float avgValence;
-    float avgArousal;
 
     float RYB_COLORS[8][3] = { 
         {1.0, 1.0, 1.0},
@@ -103,10 +98,9 @@ private:
     };
 
     //==============================================================================
-    std::vector<float> predictAV(juce::AudioBuffer<float> buffer);
     std::vector<float> calculateRGB(float valence, float arousal);
-    void averageAV(std::vector<std::vector<float>>);
     void connectToOsc();
     std::vector<float> ryb2RGB(float r, float y, float b);
     float cubicInterp(float t, float A, float B);
+
 };

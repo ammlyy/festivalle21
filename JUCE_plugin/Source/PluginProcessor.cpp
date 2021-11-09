@@ -38,18 +38,15 @@ Festivalle21AudioProcessor::Festivalle21AudioProcessor()
 
     this->sampleRate = 0.0;
     this->samplesPerBlock = 0.0;
-    this->bufferToFillSampleIdx = 0;
-    this->bufferToFill.setSize(1, BUFFER_SIZE);
-    this->av = std::vector<std::vector<float>>(COLOR_FREQUENCY, std::vector<float>(2, 0));
     this->rms = 0.0f;
-    this->currentAVindex = 0;
 
-    this->avgArousal = 0;
-    this->avgValence = 0;
 
     this->oscIpAddress = "127.0.0.1";
     this->oscPort = 5005;
     this->connectToOsc();
+
+    this->AVStrategy = new ArousalValenceStrategy(&this->treeState);
+    this->analisysStrategy = AVStrategy;
 }
 
 Festivalle21AudioProcessor::~Festivalle21AudioProcessor()
@@ -57,6 +54,7 @@ Festivalle21AudioProcessor::~Festivalle21AudioProcessor()
 #ifdef MEASURE_TIME
     this->myfile.close();
 #endif
+    delete this->AVStrategy;
 }
 
 //==============================================================================
@@ -185,36 +183,19 @@ void Festivalle21AudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, 
     // Alternatively, you can process the samples with the channels
     // interleaved by keeping the same state.
 
-    if (this->connected)
-    {
-        for (int sample = 0; sample < buffer.getNumSamples(); sample++)
-        {
-            float monoSample = 0.0;
-
-            for (int channel = 0; channel < totalNumInputChannels; ++channel)
-            {
-                auto* inputChannelData = buffer.getReadPointer(channel);
-                monoSample += inputChannelData[sample];
-            }
-
-            monoSample /= totalNumInputChannels;
-            this->bufferToFill.getWritePointer(0)[this->bufferToFillSampleIdx] = monoSample;
-
-            this->bufferToFillSampleIdx++;
-            if (this->bufferToFillSampleIdx == BUFFER_SIZE)
-            {
-                this->bufferToFillSampleIdx = 0;
-
 #ifdef MEASURE_TIME
-                using std::chrono::high_resolution_clock;
-                using std::chrono::duration_cast;
-                using std::chrono::duration;
-                using std::chrono::milliseconds;
+    using std::chrono::high_resolution_clock;
+    using std::chrono::duration_cast;
+    using std::chrono::duration;
+    using std::chrono::milliseconds;
 
-                auto t1 = high_resolution_clock::now();
+    auto t1 = high_resolution_clock::now();
 #endif
 
-                this->av.at(currentAVindex) = this->predictAV(this->bufferToFill);
+    if (this->connected)
+    {
+        this->analisysStrategy->processBuffer(buffer, totalNumInputChannels, &sender);
+    }
 
 #ifdef MEASURE_TIME
                 auto t2 = high_resolution_clock::now();
@@ -226,32 +207,7 @@ void Festivalle21AudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, 
                 duration<double, std::milli> ms_double = t2 - t1;
                 this->myfile << to_string(ms_double.count());
                 this->myfile << "\n";
-                DBG(ms_double.count());
 #endif
-
-                /*
-                this->rms = this->bufferToFill.getRMSLevel(0, 0, BUFFER_SIZE);
-                this->rms = max((20 * log(this->rms) / 2)/3, -100.f);               //convert to dB
-                float brightness = 1.0 + this->rms;
-                
-                sender.send("/juce/brightness", juce::OSCArgument(brightness));
-                */
-
-                this->currentAVindex++;
-                if (this->currentAVindex == COLOR_FREQUENCY) {
-                    this->averageAV(this->av);
-                    std::vector<float> msg = this->calculateRGB(this->avgValence, this->avgArousal);
-                    // create and send an OSC message with an address and a float value:
-                    sender.send("/juce/RGB/R", juce::OSCArgument(msg[0]));
-                    sender.send("/juce/RGB/G", juce::OSCArgument(msg[1]));
-                    sender.send("/juce/RGB/B", juce::OSCArgument(msg[2]));
-                    
-                    this->currentAVindex = 0;
-                }
-            }
-        }
-
-    }
 
 
 }
@@ -281,12 +237,6 @@ void Festivalle21AudioProcessor::setStateInformation(const void* data, int sizeI
     // whose contents will have been created by the getStateInformation() call.
 }
 
-std::vector<float> Festivalle21AudioProcessor::getAverageAV()
-{
-    std::vector<float> avgVec = { this->avgArousal, this->avgValence };
-    return avgVec;
-    //return this->av.at(0);
-}
 
 bool Festivalle21AudioProcessor::setIP(juce::String ipAddress)
 {
@@ -314,48 +264,6 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
     return new Festivalle21AudioProcessor();
 }
 
-// Predict Valence and Arousal of the buffer and returns them as std::vector (size 2)
-std::vector<float> Festivalle21AudioProcessor::predictAV(juce::AudioBuffer<float> buffer)
-{
-    std::vector<float> my_vector{ buffer.getReadPointer(0), buffer.getReadPointer(0) + BUFFER_SIZE };
-    const fdeep::tensor input(fdeep::tensor_shape(22050, 1), my_vector);
-
-    const fdeep::tensors result = model.predict({ input });
-
-    return result[0].to_vector();
-}
-
-// Calculate the average Valence and Arousal (from the av vector) and store them in the attributes 
-void Festivalle21AudioProcessor::averageAV(std::vector<std::vector<float>> av)
-{
-    int strategy = *treeState.getRawParameterValue("isManual");
-    DBG(strategy);
-    float avg_valence = 0.0f;
-    float avg_arousal = 0.0f;
-
-    if (!strategy) {
-        for (int i = 0; i < COLOR_FREQUENCY; i++) {
-            avg_valence += av[i][1];
-            avg_arousal += av[i][0];
-        }
-        avg_valence /= av.size();
-        avg_arousal /= av.size();
-
-        float rotationAngle = *treeState.getRawParameterValue("rotationAngle");
-        float newAvgVal = avg_valence * cos(rotationAngle * PI / 180.0) - avg_arousal * sin(rotationAngle * PI / 180.0);
-        float newAvgArous = avg_valence * sin(rotationAngle * PI / 180.0) + avg_arousal * cos(rotationAngle * PI / 180.0);
-
-        this->avgValence = min(1.f, newAvgVal * SCALING_FACTOR);
-        this->avgArousal = min(1.f, newAvgArous * SCALING_FACTOR);
-    }
-    else {
-        float radius = *treeState.getRawParameterValue("manualRadius");
-        float angle = *treeState.getRawParameterValue("rotationAngle");
-        this->avgValence = radius * cos(angle * PI / 180.0);
-        this->avgArousal = radius * sin(angle * PI / 180.0);
-    }
-    
-}
 
 // Calculate RGB values corresponding to the point defined by valence and arousal and returns them as std::vector (size 3)
 std::vector<float> Festivalle21AudioProcessor::calculateRGB(float valence, float arousal)
@@ -472,4 +380,11 @@ float Festivalle21AudioProcessor::cubicInterp(float t, float A, float B)
     float w = t * t * (3.0f - 2.0f * t);
 
     return A + w * (B - A);
+}
+
+std::vector<float> Festivalle21AudioProcessor::getAverageAV()
+{
+    std::vector<float> avgVec = { 0.0f , 0.0f};
+    return avgVec;
+    //return this->av.at(0);
 }
