@@ -15,44 +15,10 @@ Festivalle21AudioProcessorEditor::Festivalle21AudioProcessorEditor (Festivalle21
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     setSize (600, 650);
+
     this->startTimerHz(60);
+
     addAndMakeVisible(this->colorwheel);
-
-    this->ipLabel.setText("IP Address: ", juce::dontSendNotification);
-    this->ipLabel.setFont(juce::Font(20.0f));
-    this->ipLabel.setJustificationType(juce::Justification::centred);
-    this->ipLabel.setSize(100, 30);
-    addAndMakeVisible(this->ipLabel);
-
-    this->ipInput.setText("127.0.0.1", juce::dontSendNotification);
-    this->ipInput.setFont(juce::Font(20.0f));
-    this->ipInput.setEditable(true, false, true);
-    this->ipInput.setJustificationType(juce::Justification::centred);
-    this->ipInput.setSize(150, 30);
-    this->ipInput.setColour(juce::Label::backgroundColourId, juce::Colours::darkgrey);
-    this->ipInput.onTextChange = [this] {
-        if(!this->audioProcessor.setIP(this->ipInput.getText()))
-            this->ipInput.setText("Invalid IP address", juce::dontSendNotification);
-    };
-    addAndMakeVisible(this->ipInput);
-
-    this->portLabel.setText("Port: ", juce::dontSendNotification);
-    this->portLabel.setFont(juce::Font(20.0f));
-    this->portLabel.setJustificationType(juce::Justification::centred);
-    this->portLabel.setSize(50, 30);
-    addAndMakeVisible(this->portLabel);
-
-    this->portInput.setText("5005", juce::dontSendNotification);
-    this->portInput.setFont(juce::Font(20.0f));
-    this->portInput.setEditable(true);
-    this->portInput.setJustificationType(juce::Justification::centred);
-    this->portInput.setSize(150, 30);
-    this->portInput.setColour(juce::Label::backgroundColourId, juce::Colours::darkgrey);
-    this->portInput.onTextChange = [this] {
-        if(!this->audioProcessor.setPort(this->portInput.getText()))
-            this->portInput.setText("Invalid port", juce::dontSendNotification);
-    };
-    addAndMakeVisible(this->portInput);
 
     setResizable(false, false);
 
@@ -100,6 +66,48 @@ Festivalle21AudioProcessorEditor::Festivalle21AudioProcessorEditor (Festivalle21
     this->bypassRYBLabel.setSize(50, 30);
     this->bypassRYBLabel.attachToComponent(&this->bypassRYB, true);
     addAndMakeVisible(this->bypassRYBLabel);
+
+    this->ipLabel.setText("IP Address: ", juce::dontSendNotification);
+    this->ipLabel.setFont(juce::Font(20.0f));
+    this->ipLabel.setJustificationType(juce::Justification::centred);
+    this->ipLabel.setSize(100, 30);
+    addAndMakeVisible(this->ipLabel);
+
+    this->ipInput.setText("127.0.0.1", juce::dontSendNotification);
+    this->ipInput.setFont(juce::Font(20.0f));
+    this->ipInput.setEditable(true, false, true);
+    this->ipInput.setJustificationType(juce::Justification::centred);
+    this->ipInput.setSize(150, 30);
+    this->ipInput.setColour(juce::Label::backgroundColourId, juce::Colours::darkgrey);
+    this->ipInput.onTextChange = [this] {
+        if (!this->audioProcessor.setIP(this->ipInput.getText()))
+            this->ipInput.setText("Invalid IP address", juce::dontSendNotification);
+    };
+    addAndMakeVisible(this->ipInput);
+
+    this->portLabel.setText("Port: ", juce::dontSendNotification);
+    this->portLabel.setFont(juce::Font(20.0f));
+    this->portLabel.setJustificationType(juce::Justification::centred);
+    this->portLabel.setSize(50, 30);
+    addAndMakeVisible(this->portLabel);
+
+    this->portInput.setText("5005", juce::dontSendNotification);
+    this->portInput.setFont(juce::Font(20.0f));
+    this->portInput.setEditable(true);
+    this->portInput.setJustificationType(juce::Justification::centred);
+    this->portInput.setSize(150, 30);
+    this->portInput.setColour(juce::Label::backgroundColourId, juce::Colours::darkgrey);
+    this->portInput.onTextChange = [this] {
+        if (!this->audioProcessor.setPort(this->portInput.getText()))
+            this->portInput.setText("Invalid port", juce::dontSendNotification);
+    };
+    addAndMakeVisible(this->portInput);
+
+    this->strategySelectionAttachment.reset(new juce::AudioProcessorValueTreeState::ComboBoxAttachment(*this->valueTreeState, "strategySelection", this->strategySelector));
+    this->strategySelector.setJustificationType(juce::Justification::centred);
+    this->strategySelector.addItem("Arousal Valence", 1);
+    this->strategySelector.addItem("Colour mapping", 2);
+    addAndMakeVisible(strategySelector);
 }
 
 Festivalle21AudioProcessorEditor::~Festivalle21AudioProcessorEditor()
@@ -126,8 +134,20 @@ void Festivalle21AudioProcessorEditor::resized()
     int margin = 10;
     auto area = getLocalBounds().reduced(margin);
 
+
     this->colorwheel.setBounds(area.removeFromTop(400));
 
+    auto slidersArea = area.removeFromTop(35);
+    this->rotationSlider.setBounds(slidersArea.removeFromRight(400));
+    area.removeFromTop(10);
+    slidersArea = area.removeFromTop(40);
+    this->radiusSlider.setBounds(slidersArea.removeFromRight(400));
+    slidersArea = area.removeFromTop(30);
+    this->bypassRYB.setBounds(slidersArea.removeFromRight(160));
+    this->toggleManual.setBounds(slidersArea.removeFromRight(200));
+
+    area.removeFromTop(25);
+ 
     auto labelsArea = area.removeFromTop(30);
     labelsArea.removeFromLeft(30);
     this->ipLabel.setBounds(labelsArea.removeFromLeft(100));
@@ -136,15 +156,8 @@ void Festivalle21AudioProcessorEditor::resized()
     this->portLabel.setBounds(labelsArea.removeFromLeft(50));
     this->portInput.setBounds(labelsArea.removeFromLeft(150));
 
-    area.removeFromTop(50);
-    auto slidersArea = area.removeFromTop(40);
-    this->rotationSlider.setBounds(slidersArea.removeFromRight(400));
-    area.removeFromTop(10);
-    slidersArea = area.removeFromTop(40);
-    this->radiusSlider.setBounds(slidersArea.removeFromRight(400));
-    slidersArea = area.removeFromTop(30);
-    this->bypassRYB.setBounds(slidersArea.removeFromRight(160));
-    this->toggleManual.setBounds(slidersArea.removeFromRight(200));
+    area.removeFromTop(30);
+    this->strategySelector.setBounds(area);
     
 }
 

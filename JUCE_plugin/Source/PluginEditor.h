@@ -46,8 +46,11 @@ private:
     MyKnob radiusSlider;
     std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> isManualAttachment;
     std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> bypassRYBAttachment;
+    std::unique_ptr <juce::AudioProcessorValueTreeState::ComboBoxAttachment> strategySelectionAttachment;
     juce::ToggleButton toggleManual;
     juce::ToggleButton bypassRYB;
+
+    juce::ComboBox strategySelector;
 
 
     juce::AudioProcessorValueTreeState* valueTreeState;

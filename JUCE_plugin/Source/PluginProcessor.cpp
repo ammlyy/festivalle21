@@ -30,6 +30,7 @@ Festivalle21AudioProcessor::Festivalle21AudioProcessor()
         std::make_unique<juce::AudioParameterFloat>("manualRadius", "ManualRadius", 0.1f, 1.0f, 0.1f),
         std::make_unique<juce::AudioParameterInt>("isManual", "IsManual", 0, 1, 0),
         std::make_unique<juce::AudioParameterBool>("bypassRYB", "ByPassRYB", false),
+        std::make_unique<juce::AudioParameterInt>("strategySelection", "strategySelection", 0, 1, 0),
         })
 {
 #ifdef MEASURE_TIME
@@ -166,7 +167,6 @@ void Festivalle21AudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, 
     auto totalNumInputChannels = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-
     // In case we have more outputs than inputs, this code clears any output
     // channels that didn't contain input data, (because these aren't
     // guaranteed to be empty - they may contain garbage).
@@ -196,6 +196,8 @@ void Festivalle21AudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, 
     {
         this->analisysStrategy->processBuffer(buffer, totalNumInputChannels, &sender);
     }
+
+    //DBG(*treeState.getRawParameterValue("strategySelection"));
 
 #ifdef MEASURE_TIME
                 auto t2 = high_resolution_clock::now();
