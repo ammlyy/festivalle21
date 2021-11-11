@@ -22,6 +22,12 @@ ArousalValenceStrategy::ArousalValenceStrategy(juce::AudioProcessorValueTreeStat
     this->av = std::vector<std::vector<float>>(CHANGE_FREQUENCY, std::vector<float>(2, 0));
     this->avgArousal = 0;
     this->avgValence = 0;
+    this->data = std::vector<float>();
+    this->addresses = std::vector<juce::String>();
+    this->addresses.push_back("/juce/AV/A");
+    this->addresses.push_back("/juce/AV/V");
+    this->data.push_back(0.0f);
+    this->data.push_back(0.0f);
 }
 
 ArousalValenceStrategy::~ArousalValenceStrategy()
@@ -64,6 +70,8 @@ void ArousalValenceStrategy::processBuffer(juce::AudioBuffer<float>& buffer, int
                 this->currentAVindex = 0;
                 sender->send("/juce/AV/A", juce::OSCArgument(this->avgArousal));
                 sender->send("/juce/AV/V", juce::OSCArgument(this->avgValence));
+                this->data[0] = this->avgArousal;
+                this->data[1] = this->avgValence;
             }
         }
     }

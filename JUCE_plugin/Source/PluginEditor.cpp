@@ -16,56 +16,10 @@ Festivalle21AudioProcessorEditor::Festivalle21AudioProcessorEditor (Festivalle21
     // editor's size to whatever you need it to be.
     setSize (600, 650);
 
-    this->startTimerHz(60);
-
-    addAndMakeVisible(this->colorwheel);
+    this->canvas = new ColourMappingCanvas(this->valueTreeState, juce::Rectangle<int>(getLocalBounds().reduced(10)), this->audioProcessor.getStrategy());
+    addAndMakeVisible(this->canvas);
 
     setResizable(false, false);
-
-    this->rotationSlider.setAttachment(*valueTreeState, "rotationAngle");
-    this->rotationSlider.setSize(300, 20);
-    addAndMakeVisible(this->rotationSlider);
-
-    this->rotationLabel.setText("Rotation", juce::dontSendNotification);
-    this->rotationLabel.setFont(juce::Font(20.0f));
-    this->rotationLabel.setJustificationType(juce::Justification::centred);
-    this->rotationLabel.setSize(50, 30);
-    this->rotationLabel.attachToComponent(&this->rotationSlider, true);
-    addAndMakeVisible(this->rotationLabel);
-
-    this->radiusSlider.setAttachment(*valueTreeState, "manualRadius");
-    this->radiusSlider.setSize(300, 20);
-    addAndMakeVisible(this->radiusSlider);
-
-    this->radiusLabel.setText("Radius", juce::dontSendNotification);
-    this->radiusLabel.setFont(juce::Font(20.0f));
-    this->radiusLabel.setJustificationType(juce::Justification::centred);
-    this->radiusLabel.setSize(50, 30);
-    this->radiusLabel.attachToComponent(&this->radiusSlider, true);
-    addAndMakeVisible(this->radiusLabel);
-
-    this->isManualAttachment.reset(new juce::AudioProcessorValueTreeState::ButtonAttachment(*this->valueTreeState, "isManual", this->toggleManual));
-    this->toggleManual.setSize(30, 30);
-    addAndMakeVisible(this->toggleManual);
-
-    this->manualLabel.setText("Manual", juce::dontSendNotification);
-    this->manualLabel.setFont(juce::Font(20.0f));
-    this->manualLabel.setJustificationType(juce::Justification::centred);
-    this->manualLabel.setSize(50, 30);
-    this->manualLabel.attachToComponent(&this->toggleManual, true);
-    addAndMakeVisible(this->manualLabel);
-
-    // BYPASS RYB BUTTON
-    this->bypassRYBAttachment.reset(new juce::AudioProcessorValueTreeState::ButtonAttachment(*this->valueTreeState, "bypassRYB", this->bypassRYB));
-    this->toggleManual.setSize(30, 30);
-    addAndMakeVisible(this->bypassRYB);
-
-    this->bypassRYBLabel.setText("ByPassRYB", juce::dontSendNotification);
-    this->bypassRYBLabel.setFont(juce::Font(20.0f));
-    this->bypassRYBLabel.setJustificationType(juce::Justification::centred);
-    this->bypassRYBLabel.setSize(50, 30);
-    this->bypassRYBLabel.attachToComponent(&this->bypassRYB, true);
-    addAndMakeVisible(this->bypassRYBLabel);
 
     this->ipLabel.setText("IP Address: ", juce::dontSendNotification);
     this->ipLabel.setFont(juce::Font(20.0f));
@@ -112,13 +66,9 @@ Festivalle21AudioProcessorEditor::Festivalle21AudioProcessorEditor (Festivalle21
 
 Festivalle21AudioProcessorEditor::~Festivalle21AudioProcessorEditor()
 {
+    delete canvas;
 }
 
-void Festivalle21AudioProcessorEditor::timerCallback()
-{
-    this->colorwheel.setAV(this->audioProcessor.getAverageAV());
-    this->repaint();
-}
 //==============================================================================
 void Festivalle21AudioProcessorEditor::paint (juce::Graphics& g)
 {
@@ -134,17 +84,9 @@ void Festivalle21AudioProcessorEditor::resized()
     int margin = 10;
     auto area = getLocalBounds().reduced(margin);
 
-
-    this->colorwheel.setBounds(area.removeFromTop(400));
+    area.removeFromTop(480);
 
     auto slidersArea = area.removeFromTop(35);
-    this->rotationSlider.setBounds(slidersArea.removeFromRight(400));
-    area.removeFromTop(10);
-    slidersArea = area.removeFromTop(40);
-    this->radiusSlider.setBounds(slidersArea.removeFromRight(400));
-    slidersArea = area.removeFromTop(30);
-    this->bypassRYB.setBounds(slidersArea.removeFromRight(160));
-    this->toggleManual.setBounds(slidersArea.removeFromRight(200));
 
     area.removeFromTop(25);
  

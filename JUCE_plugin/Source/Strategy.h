@@ -23,7 +23,7 @@ public:
 
     virtual void processBuffer(juce::AudioBuffer<float>& buffer, int totalNumInputChannels, juce::OSCSender* sender);
 
-private:
+protected:
     std::vector<juce::String> addresses;
     std::vector<float> data;
 

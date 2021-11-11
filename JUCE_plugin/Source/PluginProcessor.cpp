@@ -259,6 +259,11 @@ juce::AudioProcessorValueTreeState* Festivalle21AudioProcessor::getValueTreeStat
     return &treeState;
 }
 
+Strategy* Festivalle21AudioProcessor::getStrategy()
+{
+    return this->analisysStrategy;
+}
+
 //==============================================================================
 // This creates new instances of the plugin..
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
@@ -382,11 +387,4 @@ float Festivalle21AudioProcessor::cubicInterp(float t, float A, float B)
     float w = t * t * (3.0f - 2.0f * t);
 
     return A + w * (B - A);
-}
-
-std::vector<float> Festivalle21AudioProcessor::getAverageAV()
-{
-    std::vector<float> avgVec = { 0.0f , 0.0f};
-    return avgVec;
-    //return this->av.at(0);
 }

@@ -63,11 +63,11 @@ public:
     //==============================================================================
     void getStateInformation(juce::MemoryBlock& destData) override;
     void setStateInformation(const void* data, int sizeInBytes) override;
-    std::vector<float> getAverageAV();
     bool setIP(juce::String ipAddress);
     bool setPort(juce::String port);
 
     juce::AudioProcessorValueTreeState* getValueTreeState();
+    Strategy* getStrategy();
 
 private:
 

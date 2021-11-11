@@ -6,6 +6,10 @@
               pluginVST3Category="Analyzer,Fx">
   <MAINGROUP id="o6mKob" name="OSC_toolkit">
     <GROUP id="{8919C6B9-B79B-DB30-D6F5-6F616A95C221}" name="Source">
+      <FILE id="Crm4cc" name="ColourMappingCanvas.cpp" compile="1" resource="0"
+            file="Source/ColourMappingCanvas.cpp"/>
+      <FILE id="PPfWWc" name="ColourMappingCanvas.h" compile="0" resource="0"
+            file="Source/ColourMappingCanvas.h"/>
       <FILE id="lzLjW5" name="ArousalValenceStrategy.cpp" compile="1" resource="0"
             file="Source/ArousalValenceStrategy.cpp"/>
       <FILE id="tWoE07" name="ArousalValenceStrategy.h" compile="0" resource="0"

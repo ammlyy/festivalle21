@@ -10,13 +10,13 @@
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
-#include "ColorWheel.h"
 #include "MyKnob.h"
+#include "ColourMappingCanvas.h"
 
 //==============================================================================
 /**
 */
-class Festivalle21AudioProcessorEditor  : public juce::AudioProcessorEditor, public juce::Timer
+class Festivalle21AudioProcessorEditor  : public juce::AudioProcessorEditor
 {
 public:
     Festivalle21AudioProcessorEditor (Festivalle21AudioProcessor&);
@@ -25,19 +25,21 @@ public:
     //==============================================================================
     void paint (juce::Graphics&) override;
     void resized() override;
-    void timerCallback() override;
+    
 
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     Festivalle21AudioProcessor& audioProcessor;
-    ColorWheel colorwheel{ 400,300 };
+    //ColorWheel colorwheel{ 400,300 };
     juce::Label portLabel;
     juce::Label portInput;
     juce::Label ipLabel;
     juce::Label ipInput;
 
-    juce::Label radiusLabel;
+    Component* canvas;
+
+    /*juce::Label radiusLabel;
     juce::Label rotationLabel;
     juce::Label manualLabel;
     juce::Label bypassRYBLabel;
@@ -45,10 +47,10 @@ private:
     MyKnob rotationSlider;
     MyKnob radiusSlider;
     std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> isManualAttachment;
-    std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> bypassRYBAttachment;
+    std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> bypassRYBAttachment;*/
     std::unique_ptr <juce::AudioProcessorValueTreeState::ComboBoxAttachment> strategySelectionAttachment;
-    juce::ToggleButton toggleManual;
-    juce::ToggleButton bypassRYB;
+    /*juce::ToggleButton toggleManual;
+    juce::ToggleButton bypassRYB;*/
 
     juce::ComboBox strategySelector;
 
