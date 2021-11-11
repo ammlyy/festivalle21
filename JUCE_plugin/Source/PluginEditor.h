@@ -10,12 +10,14 @@
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
-#include "ColorWheel.h"
+#include "MyKnob.h"
+#include "ColourMappingCanvas.h"
+#include "ArousalValenceCanvas.h"
 
 //==============================================================================
 /**
 */
-class Festivalle21AudioProcessorEditor  : public juce::AudioProcessorEditor, public juce::Timer
+class Festivalle21AudioProcessorEditor  : public juce::AudioProcessorEditor
 {
 public:
     Festivalle21AudioProcessorEditor (Festivalle21AudioProcessor&);
@@ -24,17 +26,26 @@ public:
     //==============================================================================
     void paint (juce::Graphics&) override;
     void resized() override;
-    void timerCallback() override;
+    
 
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     Festivalle21AudioProcessor& audioProcessor;
-    ColorWheel colorwheel{ 400,300 };
+
     juce::Label portLabel;
     juce::Label portInput;
     juce::Label ipLabel;
     juce::Label ipInput;
+
+    Component* canvas;
+    std::unique_ptr <juce::AudioProcessorValueTreeState::ComboBoxAttachment> strategySelectionAttachment;
+
+    juce::ComboBox strategySelector;
+    void strategySelectionChanged();
+
+
+    juce::AudioProcessorValueTreeState* valueTreeState;
 
     //JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Festivalle21AudioProcessorEditor)
 };

@@ -1,11 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="DOHn4D" name="Festivalle21" projectType="audioplug" useAppConfig="0"
+<JUCERPROJECT id="DOHn4D" name="OSC_toolkit" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
               headerPath="C:\src\vcpkg\vcpkg\installed\x86-windows\include"
               pluginVST3Category="Analyzer,Fx">
-  <MAINGROUP id="o6mKob" name="Festivalle21">
+  <MAINGROUP id="o6mKob" name="OSC_toolkit">
     <GROUP id="{8919C6B9-B79B-DB30-D6F5-6F616A95C221}" name="Source">
+      <GROUP id="{05F4DA22-9E35-20A6-E112-0B8955AE1466}" name="Strategies">
+        <FILE id="lzLjW5" name="ArousalValenceStrategy.cpp" compile="1" resource="0"
+              file="Source/ArousalValenceStrategy.cpp"/>
+        <FILE id="auq8GJ" name="ColourMappingStrategy.cpp" compile="1" resource="0"
+              file="Source/ColourMappingStrategy.cpp"/>
+        <FILE id="bnSGgx" name="ColourMappingStrategy.h" compile="0" resource="0"
+              file="Source/ColourMappingStrategy.h"/>
+        <FILE id="tWoE07" name="ArousalValenceStrategy.h" compile="0" resource="0"
+              file="Source/ArousalValenceStrategy.h"/>
+        <FILE id="wtAONR" name="Strategy.cpp" compile="1" resource="0" file="Source/Strategy.cpp"/>
+        <FILE id="BlNEmY" name="Strategy.h" compile="0" resource="0" file="Source/Strategy.h"/>
+      </GROUP>
+      <GROUP id="{C95EA35B-123B-BC07-C6A6-DD02043753AC}" name="GUI">
+        <FILE id="mZZuUF" name="ArousalValenceCanvas.cpp" compile="1" resource="0"
+              file="Source/ArousalValenceCanvas.cpp"/>
+        <FILE id="yCYcH8" name="ArousalValenceCanvas.h" compile="0" resource="0"
+              file="Source/ArousalValenceCanvas.h"/>
+        <FILE id="Crm4cc" name="ColourMappingCanvas.cpp" compile="1" resource="0"
+              file="Source/ColourMappingCanvas.cpp"/>
+        <FILE id="PPfWWc" name="ColourMappingCanvas.h" compile="0" resource="0"
+              file="Source/ColourMappingCanvas.h"/>
+        <FILE id="dfEcef" name="PluginEditor.cpp" compile="1" resource="0"
+              file="Source/PluginEditor.cpp"/>
+        <FILE id="pprZPa" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+        <FILE id="JsnJh3" name="ColorWheel.cpp" compile="1" resource="0" file="Source/ColorWheel.cpp"/>
+        <FILE id="mnmDqP" name="ColorWheel.h" compile="0" resource="0" file="Source/ColorWheel.h"/>
+        <FILE id="OPuO3x" name="MyKnob.cpp" compile="1" resource="0" file="Source/MyKnob.cpp"/>
+        <FILE id="JrBrGl" name="MyKnob.h" compile="0" resource="0" file="Source/MyKnob.h"/>
+      </GROUP>
       <GROUP id="{CFB456C6-DE13-4941-AC49-CB2725A3B2BC}" name="models">
         <GROUP id="{DF4530AE-42E0-6652-94F2-B0DB34D6719E}" name="exported">
           <FILE id="vhbrqc" name="exported_model.json" compile="0" resource="1"
@@ -19,11 +48,6 @@
             file="Source/PluginProcessor.cpp"/>
       <FILE id="rJh728" name="PluginProcessor.h" compile="0" resource="0"
             file="Source/PluginProcessor.h"/>
-      <FILE id="dfEcef" name="PluginEditor.cpp" compile="1" resource="0"
-            file="Source/PluginEditor.cpp"/>
-      <FILE id="pprZPa" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
-      <FILE id="JsnJh3" name="ColorWheel.cpp" compile="1" resource="0" file="Source/ColorWheel.cpp"/>
-      <FILE id="mnmDqP" name="ColorWheel.h" compile="0" resource="0" file="Source/ColorWheel.h"/>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>

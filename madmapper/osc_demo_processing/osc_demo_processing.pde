@@ -8,7 +8,7 @@ float R, G, B = 0.0;
 float V, A = 0.0;
 void setup() {
   size(200,200);
-  osc = new OscP5(this, 5005);
+  osc = new OscP5("127.0.0.1", 5005);
   }
 
 void draw() {

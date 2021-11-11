@@ -10,13 +10,16 @@
 #include "PluginEditor.h"
 //==============================================================================
 Festivalle21AudioProcessorEditor::Festivalle21AudioProcessorEditor (Festivalle21AudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p)
+    : AudioProcessorEditor (&p), audioProcessor (p), valueTreeState(p.getValueTreeState())
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (600, 500);
-    this->startTimerHz(60);
-    addAndMakeVisible(this->colorwheel);
+    setSize (600, 650);
+
+    this->canvas = new ColourMappingCanvas(this->valueTreeState, juce::Rectangle<int>(getLocalBounds().reduced(10)), this->audioProcessor.getStrategy());
+    addAndMakeVisible(this->canvas);
+
+    setResizable(false, false);
 
     this->ipLabel.setText("IP Address: ", juce::dontSendNotification);
     this->ipLabel.setFont(juce::Font(20.0f));
@@ -31,7 +34,7 @@ Festivalle21AudioProcessorEditor::Festivalle21AudioProcessorEditor (Festivalle21
     this->ipInput.setSize(150, 30);
     this->ipInput.setColour(juce::Label::backgroundColourId, juce::Colours::darkgrey);
     this->ipInput.onTextChange = [this] {
-        if(!this->audioProcessor.setIP(this->ipInput.getText()))
+        if (!this->audioProcessor.setIP(this->ipInput.getText()))
             this->ipInput.setText("Invalid IP address", juce::dontSendNotification);
     };
     addAndMakeVisible(this->ipInput);
@@ -49,23 +52,24 @@ Festivalle21AudioProcessorEditor::Festivalle21AudioProcessorEditor (Festivalle21
     this->portInput.setSize(150, 30);
     this->portInput.setColour(juce::Label::backgroundColourId, juce::Colours::darkgrey);
     this->portInput.onTextChange = [this] {
-        if(!this->audioProcessor.setPort(this->portInput.getText()))
+        if (!this->audioProcessor.setPort(this->portInput.getText()))
             this->portInput.setText("Invalid port", juce::dontSendNotification);
     };
     addAndMakeVisible(this->portInput);
 
-    setResizable(false, false);
+    this->strategySelectionAttachment.reset(new juce::AudioProcessorValueTreeState::ComboBoxAttachment(*this->valueTreeState, "strategySelection", this->strategySelector));
+    this->strategySelector.onChange = [this] { this->strategySelectionChanged(); };
+    this->strategySelector.setJustificationType(juce::Justification::centred);
+    this->strategySelector.addItem("Arousal Valence", 1);
+    this->strategySelector.addItem("Colour mapping", 2);
+    addAndMakeVisible(strategySelector);
 }
 
 Festivalle21AudioProcessorEditor::~Festivalle21AudioProcessorEditor()
 {
+    delete canvas;
 }
 
-void Festivalle21AudioProcessorEditor::timerCallback()
-{
-    this->colorwheel.setAV(this->audioProcessor.getAV());
-    this->repaint();
-}
 //==============================================================================
 void Festivalle21AudioProcessorEditor::paint (juce::Graphics& g)
 {
@@ -81,8 +85,12 @@ void Festivalle21AudioProcessorEditor::resized()
     int margin = 10;
     auto area = getLocalBounds().reduced(margin);
 
-    this->colorwheel.setBounds(area.removeFromTop(400));
+    area.removeFromTop(480);
 
+    auto slidersArea = area.removeFromTop(35);
+
+    area.removeFromTop(25);
+ 
     auto labelsArea = area.removeFromTop(30);
     labelsArea.removeFromLeft(30);
     this->ipLabel.setBounds(labelsArea.removeFromLeft(100));
@@ -90,5 +98,28 @@ void Festivalle21AudioProcessorEditor::resized()
     labelsArea.removeFromLeft(50);
     this->portLabel.setBounds(labelsArea.removeFromLeft(50));
     this->portInput.setBounds(labelsArea.removeFromLeft(150));
+
+    area.removeFromTop(30);
+    this->strategySelector.setBounds(area);
+    
+}
+
+void Festivalle21AudioProcessorEditor::strategySelectionChanged()
+{
+    this->audioProcessor.changeStrategy();
+    this->canvas->setVisible(false);
+    delete this->canvas;
+    switch (strategySelector.getSelectedItemIndex()) {
+    case 0:
+        this->canvas = new ArousalValenceCanvas(this->valueTreeState, juce::Rectangle<int>(getLocalBounds().reduced(10).removeFromTop(550)), this->audioProcessor.getStrategy());
+        break;
+    case 1:
+        canvas = new ColourMappingCanvas(this->valueTreeState, juce::Rectangle<int>(getLocalBounds().reduced(10)), this->audioProcessor.getStrategy());
+        break;
+    default:
+        break;
+    }
+    addAndMakeVisible(this->canvas);
+    repaint();
 }
 

@@ -53,8 +53,12 @@ void ColorWheel::drawPoint(juce::Graphics& g, std::vector<float> av)
 {
     const auto centre = getLocalBounds().toFloat().getCentre();
     float radius = getWidth() / 4.0;
+    auto abscissa = av[1] * radius;
+    auto ordinate = -1.0f * av[0] * radius;
+    abscissa += centre.x;
+    ordinate += centre.y;
     g.setColour(juce::Colours::darkgrey);
-    g.drawEllipse(centre.x + av[1] * radius, centre.y - av[0] * radius, 5.f, 5.f, 5.f);
+    g.drawEllipse(abscissa, ordinate, 5.f, 5.f, 5.f);
 
 }
 
@@ -62,3 +66,4 @@ void ColorWheel::setAV(std::vector<float> av)
 {
     this->av = av;
 }
+

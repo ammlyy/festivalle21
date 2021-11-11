@@ -23,6 +23,15 @@ Festivalle21AudioProcessor::Festivalle21AudioProcessor()
 #endif
     )
 #endif
+    ,
+    treeState(*this, nullptr, juce::Identifier("CURRENT_STATE"),
+        {
+        std::make_unique<juce::AudioParameterFloat>("rotationAngle", "RotationAngle", 0.0f, 360.0f, 0.0f), // id, name, min,max, initial value
+        std::make_unique<juce::AudioParameterFloat>("manualRadius", "ManualRadius", 0.1f, 1.0f, 0.1f),
+        std::make_unique<juce::AudioParameterInt>("isManual", "IsManual", 0, 1, 0),
+        std::make_unique<juce::AudioParameterBool>("bypassRYB", "ByPassRYB", false),
+        std::make_unique<juce::AudioParameterInt>("strategySelection", "strategySelection", 0, 1, 0),
+        })
 {
 #ifdef MEASURE_TIME
     this->myfile.open("timing_measure.txt");
@@ -30,18 +39,16 @@ Festivalle21AudioProcessor::Festivalle21AudioProcessor()
 
     this->sampleRate = 0.0;
     this->samplesPerBlock = 0.0;
-    this->bufferToFillSampleIdx = 0;
-    this->bufferToFill.setSize(1, BUFFER_SIZE);
-    this->av = std::vector<std::vector<float>>(COLOR_FREQUENCY, std::vector<float>(2, 0));
     this->rms = 0.0f;
-    this->currentAVindex = 0;
 
-    this->avgArousal = 0;
-    this->avgValence = 0;
 
     this->oscIpAddress = "127.0.0.1";
     this->oscPort = 5005;
     this->connectToOsc();
+
+    this->AVStrategy = new ArousalValenceStrategy(&this->treeState);
+    this->CMStrategy = new ColourMappingStrategy(&this->treeState);
+    this->analisysStrategy = AVStrategy;
 }
 
 Festivalle21AudioProcessor::~Festivalle21AudioProcessor()
@@ -49,6 +56,8 @@ Festivalle21AudioProcessor::~Festivalle21AudioProcessor()
 #ifdef MEASURE_TIME
     this->myfile.close();
 #endif
+    delete this->AVStrategy;
+    delete this->CMStrategy;
 }
 
 //==============================================================================
@@ -160,7 +169,6 @@ void Festivalle21AudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, 
     auto totalNumInputChannels = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-
     // In case we have more outputs than inputs, this code clears any output
     // channels that didn't contain input data, (because these aren't
     // guaranteed to be empty - they may contain garbage).
@@ -177,36 +185,21 @@ void Festivalle21AudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, 
     // Alternatively, you can process the samples with the channels
     // interleaved by keeping the same state.
 
-    if (this->connected)
-    {
-        for (int sample = 0; sample < buffer.getNumSamples(); sample++)
-        {
-            float monoSample = 0.0;
-
-            for (int channel = 0; channel < totalNumInputChannels; ++channel)
-            {
-                auto* inputChannelData = buffer.getReadPointer(channel);
-                monoSample += inputChannelData[sample];
-            }
-
-            monoSample /= totalNumInputChannels;
-            this->bufferToFill.getWritePointer(0)[this->bufferToFillSampleIdx] = monoSample;
-
-            this->bufferToFillSampleIdx++;
-            if (this->bufferToFillSampleIdx == BUFFER_SIZE)
-            {
-                this->bufferToFillSampleIdx = 0;
-
 #ifdef MEASURE_TIME
-                using std::chrono::high_resolution_clock;
-                using std::chrono::duration_cast;
-                using std::chrono::duration;
-                using std::chrono::milliseconds;
+    using std::chrono::high_resolution_clock;
+    using std::chrono::duration_cast;
+    using std::chrono::duration;
+    using std::chrono::milliseconds;
 
-                auto t1 = high_resolution_clock::now();
+    auto t1 = high_resolution_clock::now();
 #endif
 
-                this->av.at(currentAVindex) = this->predictAV(this->bufferToFill);
+    if (this->connected)
+    {
+        this->analisysStrategy->processBuffer(buffer, totalNumInputChannels, &sender);
+    }
+
+    //DBG(*treeState.getRawParameterValue("strategySelection"));
 
 #ifdef MEASURE_TIME
                 auto t2 = high_resolution_clock::now();
@@ -218,27 +211,7 @@ void Festivalle21AudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, 
                 duration<double, std::milli> ms_double = t2 - t1;
                 this->myfile << to_string(ms_double.count());
                 this->myfile << "\n";
-                DBG(ms_double.count());
 #endif
-
-                this->rms = this->bufferToFill.getRMSLevel(0, 0, BUFFER_SIZE);
-                this->rms = max((20 * log(this->rms) / 2)/3, -100.f);               //convert to dB
-                float brightness = 1.0 + this->rms;
-
-                sender.send("/juce/brightness", juce::OSCArgument(brightness));
-
-                this->currentAVindex++;
-                if (this->currentAVindex == COLOR_FREQUENCY) {
-                    this->averageAV(this->av);
-                    std::vector<float> msg = this->calculateRGB(this->avgValence, this->avgArousal);
-                    // create and send an OSC message with an address and a float value:
-                    sender.send("/juce/RGB", juce::OSCArgument(msg[0]), juce::OSCArgument(msg[1]), juce::OSCArgument(msg[2]));
-                    this->currentAVindex = 0;
-                }
-            }
-        }
-
-    }
 
 
 }
@@ -268,12 +241,6 @@ void Festivalle21AudioProcessor::setStateInformation(const void* data, int sizeI
     // whose contents will have been created by the getStateInformation() call.
 }
 
-std::vector<float> Festivalle21AudioProcessor::getAV()
-{
-    std::vector<float> avgVec = { this->avgArousal, this->avgValence };
-    return avgVec;
-    //return this->av.at(0);
-}
 
 bool Festivalle21AudioProcessor::setIP(juce::String ipAddress)
 {
@@ -289,105 +256,37 @@ bool Festivalle21AudioProcessor::setPort(juce::String port)
     return this->connected;
 }
 
+juce::AudioProcessorValueTreeState* Festivalle21AudioProcessor::getValueTreeState()
+{
+    return &treeState;
+}
+
+Strategy* Festivalle21AudioProcessor::getStrategy()
+{
+    return this->analisysStrategy;
+}
+
+void Festivalle21AudioProcessor::changeStrategy()
+{
+    int strat = (int)treeState.getRawParameterValue("strategySelection");
+
+    switch (strat) {
+    case 0:
+        this->analisysStrategy = this->AVStrategy;
+        break;
+    case 1:
+        this->analisysStrategy = this->CMStrategy;
+        break;
+    default:
+        break;
+    }
+}
+
 //==============================================================================
 // This creates new instances of the plugin..
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new Festivalle21AudioProcessor();
-}
-
-// Predict Valence and Arousal of the buffer and returns them as std::vector (size 2)
-std::vector<float> Festivalle21AudioProcessor::predictAV(juce::AudioBuffer<float> buffer)
-{
-    std::vector<float> my_vector{ buffer.getReadPointer(0), buffer.getReadPointer(0) + BUFFER_SIZE };
-    const fdeep::tensor input(fdeep::tensor_shape(22050, 1), my_vector);
-
-    const fdeep::tensors result = model.predict({ input });
-
-    return result[0].to_vector();
-}
-
-// Calculate the average Valence and Arousal (from the av vector) and store them in the attributes 
-void Festivalle21AudioProcessor::averageAV(std::vector<std::vector<float>> av)
-{
-    float avg_valence = 0.0f;
-    float avg_arousal = 0.0f;
-
-    for (int i = 0; i < COLOR_FREQUENCY; i++) {
-        avg_valence += av[i][1];
-        avg_arousal += av[i][0];
-    }
-    avg_valence /= av.size();
-    avg_arousal /= av.size();
-
-    this->avgValence = min(1.f, avg_valence * SCALING_FACTOR);
-    this->avgArousal = min(1.f, avg_arousal * SCALING_FACTOR);
-}
-
-// Calculate RGB values corresponding to the point defined by valence and arousal and returns them as std::vector (size 3)
-std::vector<float> Festivalle21AudioProcessor::calculateRGB(float valence, float arousal)
-{
-    float R = 0.0f;
-    float Y = 0.0f;
-    float B = 0.0f;
-
-    float H = (atan2(valence, arousal) * 180.0 / PI) + 30;    // Hue
-    if (H < 0) {
-        H = 360.0 + H;
-    }
-    DBG("H: " + to_string(H));
-    float S = min(sqrt(pow(valence, 2) + pow(arousal, 2)), 1.0);    // Saturation (distance)
-    float V = 1;  //Intensity
-
-    float C = V * S;
-    float X = C * (1.0 - std::abs(std::fmod((H / 60.0), 2.0) - 1.0));
-    float m = V - C;
-
-    if (H >= 0 && H < 60) {
-        R = C;
-        Y = X;
-        B = 0;
-    }
-    else if (H >= 60 && H < 120) {
-        R = X;
-        Y = C;
-        B = 0;
-    }
-    else if (H >= 120 && H < 180) {
-        R = 0;
-        Y = C;
-        B = X;
-    }
-    else if (H >= 180 && H < 240) {
-        R = 0;
-        Y = X;
-        B = C;
-    }
-    else if (H >= 240 && H < 300) {
-        R = X;
-        Y = 0;
-        B = C;
-    }
-    else if (H >= 300 && H <= 360) {
-        R = C;
-        Y = 0;
-        B = X;
-    }
-
-    R = (R + m);
-    Y = (Y + m);
-    B = (B + m);
-
-    std::vector<float> rgbValues = ryb2RGB(R, Y, B);
-    /*for (auto& el : rgbValues) {
-        el *= 255.0f;
-    }*/
-
-    DBG("R: " + to_string(rgbValues[0]));
-    DBG("G: " + to_string(rgbValues[1]));
-    DBG("B: " + to_string(rgbValues[2]));
-
-    return rgbValues;
 }
 
 void Festivalle21AudioProcessor::connectToOsc()
@@ -398,44 +297,3 @@ void Festivalle21AudioProcessor::connectToOsc()
     (this->oscPort == 0 || this->oscPort >= 65536) ? this->connected = false : this->connected = true;
 }
 
-// Convert RYB values to RGB
-std::vector<float> Festivalle21AudioProcessor::ryb2RGB(float r, float y, float b)
-{
-    std::vector<float> rgb(3);
-
-    float x0 = this->cubicInterp(b, RYB_COLORS[0][0], RYB_COLORS[4][0]);
-    float x1 = this->cubicInterp(b, RYB_COLORS[1][0], RYB_COLORS[5][0]);
-    float x2 = this->cubicInterp(b, RYB_COLORS[2][0], RYB_COLORS[6][0]);
-    float x3 = this->cubicInterp(b, RYB_COLORS[3][0], RYB_COLORS[7][0]);
-    float y0 = this->cubicInterp(y, x0, x1);
-    float y1 = this->cubicInterp(y, x2, x3);
-
-    rgb[0] = this->cubicInterp(r, y0, y1);
-
-    x0 = this->cubicInterp(b, RYB_COLORS[0][1], RYB_COLORS[4][1]);
-    x1 = this->cubicInterp(b, RYB_COLORS[1][1], RYB_COLORS[5][1]);
-    x2 = this->cubicInterp(b, RYB_COLORS[2][1], RYB_COLORS[6][1]);
-    x3 = this->cubicInterp(b, RYB_COLORS[3][1], RYB_COLORS[7][1]);
-    y0 = this->cubicInterp(y, x0, x1);
-    y1 = this->cubicInterp(y, x2, x3);
-
-    rgb[1] = this->cubicInterp(r, y0, y1);
-
-    x0 = this->cubicInterp(b, RYB_COLORS[0][2], RYB_COLORS[4][2]);
-    x1 = this->cubicInterp(b, RYB_COLORS[1][2], RYB_COLORS[5][2]);
-    x2 = this->cubicInterp(b, RYB_COLORS[2][2], RYB_COLORS[6][2]);
-    x3 = this->cubicInterp(b, RYB_COLORS[3][2], RYB_COLORS[7][2]);
-    y0 = this->cubicInterp(y, x0, x1);
-    y1 = this->cubicInterp(y, x2, x3);
-
-    rgb[2] = this->cubicInterp(r, y0, y1);
-
-    return rgb;
-}
-
-float Festivalle21AudioProcessor::cubicInterp(float t, float A, float B)
-{
-    float w = t * t * (3.0f - 2.0f * t);
-
-    return A + w * (B - A);
-}

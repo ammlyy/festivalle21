@@ -1,7 +1,9 @@
 #pragma once
 #include <JuceHeader.h>
 
-class ColorWheel : public juce::Component {
+#define PI 3.14159265
+
+class ColorWheel : public juce::Component{
 public:
 
     ColorWheel(int width, int height);
@@ -17,5 +19,7 @@ public:
 private:
     juce::Image wheelImage;
     std::vector<float> av;
+
+    float rotationAngle;
 
 };
