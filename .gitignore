@@ -1,7 +1,7 @@
 JUCE_plugin/Builds
-JUCE_plugin/JuceLibraryCode
-JUCE_plugin/.vs
-JUCE_plugin/.vscode
+Festivalle21/JuceLibraryCode
+Festivalle21/.vs
+Festivalle21/.vscode
 py/venv
 .vs
 .vscode
