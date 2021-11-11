@@ -12,6 +12,7 @@
 #include <fdeep/fdeep.hpp>
 #include <string>
 #include "ArousalValenceStrategy.h"
+#include "ColourMappingStrategy.h"
 
 #define PI 3.14159265
 #define BUFFER_SIZE 22050 //500 ms at 44.1kHz
@@ -30,6 +31,8 @@ public:
     //==============================================================================
     Festivalle21AudioProcessor();
     ~Festivalle21AudioProcessor() override;
+
+    void changeStrategy();
 
     //==============================================================================
     void prepareToPlay(double sampleRate, int samplesPerBlock) override;
@@ -69,12 +72,15 @@ public:
     juce::AudioProcessorValueTreeState* getValueTreeState();
     Strategy* getStrategy();
 
+    
+
 private:
 
 #ifdef MEASURE_TIME
     std::ofstream myfile;
 #endif
     ArousalValenceStrategy* AVStrategy;
+    ColourMappingStrategy* CMStrategy;
     Strategy* analisysStrategy;
     juce::AudioProcessorValueTreeState treeState;
     double sampleRate;
@@ -86,21 +92,7 @@ private:
     int oscPort;
 
 
-    float RYB_COLORS[8][3] = { 
-        {1.0, 1.0, 1.0},
-        { 1.0, 1.0 , 0.0 },
-        { 1.0, 0.0, 0.0 },
-        { 1.0, .5, 0.0 },
-        {0.163, 0.373, 0.6},
-        { 0.0, 0.66, 0.2 },
-        { .5, 0.0, 0.5 },
-        { 0.2, 0.094, 0.0 }
-    };
 
     //==============================================================================
-    std::vector<float> calculateRGB(float valence, float arousal);
     void connectToOsc();
-    std::vector<float> ryb2RGB(float r, float y, float b);
-    float cubicInterp(float t, float A, float B);
-
 };

@@ -47,6 +47,7 @@ Festivalle21AudioProcessor::Festivalle21AudioProcessor()
     this->connectToOsc();
 
     this->AVStrategy = new ArousalValenceStrategy(&this->treeState);
+    this->CMStrategy = new ColourMappingStrategy(&this->treeState);
     this->analisysStrategy = AVStrategy;
 }
 
@@ -56,6 +57,7 @@ Festivalle21AudioProcessor::~Festivalle21AudioProcessor()
     this->myfile.close();
 #endif
     delete this->AVStrategy;
+    delete this->CMStrategy;
 }
 
 //==============================================================================
@@ -264,79 +266,27 @@ Strategy* Festivalle21AudioProcessor::getStrategy()
     return this->analisysStrategy;
 }
 
+void Festivalle21AudioProcessor::changeStrategy()
+{
+    int strat = (int)treeState.getRawParameterValue("strategySelection");
+
+    switch (strat) {
+    case 0:
+        this->analisysStrategy = this->AVStrategy;
+        break;
+    case 1:
+        this->analisysStrategy = this->CMStrategy;
+        break;
+    default:
+        break;
+    }
+}
+
 //==============================================================================
 // This creates new instances of the plugin..
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new Festivalle21AudioProcessor();
-}
-
-
-// Calculate RGB values corresponding to the point defined by valence and arousal and returns them as std::vector (size 3)
-std::vector<float> Festivalle21AudioProcessor::calculateRGB(float valence, float arousal)
-{
-    float R = 0.0f;
-    float Y = 0.0f;
-    float B = 0.0f;
-
-    float H = (atan2(valence, arousal) * 180.0 / PI) + 30;    // Hue
-    if (H < 0) {
-        H = 360.0 + H;
-    }
-    DBG("H: " + to_string(H));
-    float S = min(max(sqrt(pow(valence, 2) + pow(arousal, 2)), 0.6), 1.0);    // Saturation (distance)
-    float V = 1;  //Intensity
-
-    float C = V * S;
-    float X = C * (1.0 - std::abs(std::fmod((H / 60.0), 2.0) - 1.0));
-    float m = V - C;
-
-    if (H >= 0 && H < 60) {
-        R = C;
-        Y = X;
-        B = 0;
-    }
-    else if (H >= 60 && H < 120) {
-        R = X;
-        Y = C;
-        B = 0;
-    }
-    else if (H >= 120 && H < 180) {
-        R = 0;
-        Y = C;
-        B = X;
-    }
-    else if (H >= 180 && H < 240) {
-        R = 0;
-        Y = X;
-        B = C;
-    }
-    else if (H >= 240 && H < 300) {
-        R = X;
-        Y = 0;
-        B = C;
-    }
-    else if (H >= 300 && H <= 360) {
-        R = C;
-        Y = 0;
-        B = X;
-    }
-
-    R = (R + m);
-    Y = (Y + m);
-    B = (B + m);
-
-    std::vector<float> rgbValues = ryb2RGB(R, Y, B);
-    *treeState.getRawParameterValue("bypassRYB") ? rgbValues = { R, Y, B } : rgbValues = ryb2RGB(R, Y, B);
-    /*for (auto& el : rgbValues) {
-        el *= 255.0f;
-    }*/
-
-    DBG("R: " + to_string(rgbValues[0]));
-    DBG("G: " + to_string(rgbValues[1]));
-    DBG("B: " + to_string(rgbValues[2]));
-
-    return rgbValues;
 }
 
 void Festivalle21AudioProcessor::connectToOsc()
@@ -347,44 +297,3 @@ void Festivalle21AudioProcessor::connectToOsc()
     (this->oscPort == 0 || this->oscPort >= 65536) ? this->connected = false : this->connected = true;
 }
 
-// Convert RYB values to RGB
-std::vector<float> Festivalle21AudioProcessor::ryb2RGB(float r, float y, float b)
-{
-    std::vector<float> rgb(3);
-
-    float x0 = this->cubicInterp(b, RYB_COLORS[0][0], RYB_COLORS[4][0]);
-    float x1 = this->cubicInterp(b, RYB_COLORS[1][0], RYB_COLORS[5][0]);
-    float x2 = this->cubicInterp(b, RYB_COLORS[2][0], RYB_COLORS[6][0]);
-    float x3 = this->cubicInterp(b, RYB_COLORS[3][0], RYB_COLORS[7][0]);
-    float y0 = this->cubicInterp(y, x0, x1);
-    float y1 = this->cubicInterp(y, x2, x3);
-
-    rgb[0] = this->cubicInterp(r, y0, y1);
-
-    x0 = this->cubicInterp(b, RYB_COLORS[0][1], RYB_COLORS[4][1]);
-    x1 = this->cubicInterp(b, RYB_COLORS[1][1], RYB_COLORS[5][1]);
-    x2 = this->cubicInterp(b, RYB_COLORS[2][1], RYB_COLORS[6][1]);
-    x3 = this->cubicInterp(b, RYB_COLORS[3][1], RYB_COLORS[7][1]);
-    y0 = this->cubicInterp(y, x0, x1);
-    y1 = this->cubicInterp(y, x2, x3);
-
-    rgb[1] = this->cubicInterp(r, y0, y1);
-
-    x0 = this->cubicInterp(b, RYB_COLORS[0][2], RYB_COLORS[4][2]);
-    x1 = this->cubicInterp(b, RYB_COLORS[1][2], RYB_COLORS[5][2]);
-    x2 = this->cubicInterp(b, RYB_COLORS[2][2], RYB_COLORS[6][2]);
-    x3 = this->cubicInterp(b, RYB_COLORS[3][2], RYB_COLORS[7][2]);
-    y0 = this->cubicInterp(y, x0, x1);
-    y1 = this->cubicInterp(y, x2, x3);
-
-    rgb[2] = this->cubicInterp(r, y0, y1);
-
-    return rgb;
-}
-
-float Festivalle21AudioProcessor::cubicInterp(float t, float A, float B)
-{
-    float w = t * t * (3.0f - 2.0f * t);
-
-    return A + w * (B - A);
-}

@@ -16,7 +16,9 @@ Festivalle21AudioProcessorEditor::Festivalle21AudioProcessorEditor (Festivalle21
     // editor's size to whatever you need it to be.
     setSize (600, 650);
 
-    this->canvas = new ColourMappingCanvas(this->valueTreeState, juce::Rectangle<int>(getLocalBounds().reduced(10)), this->audioProcessor.getStrategy());
+    this->CMCanvas = new ColourMappingCanvas(this->valueTreeState, juce::Rectangle<int>(getLocalBounds().reduced(10)), this->audioProcessor.getStrategy());
+    this->AVCanvas = new ArousalValenceCanvas(this->valueTreeState, juce::Rectangle<int>(getLocalBounds().reduced(10)), this->audioProcessor.getStrategy());
+    this->canvas = this->CMCanvas;
     addAndMakeVisible(this->canvas);
 
     setResizable(false, false);
@@ -58,6 +60,7 @@ Festivalle21AudioProcessorEditor::Festivalle21AudioProcessorEditor (Festivalle21
     addAndMakeVisible(this->portInput);
 
     this->strategySelectionAttachment.reset(new juce::AudioProcessorValueTreeState::ComboBoxAttachment(*this->valueTreeState, "strategySelection", this->strategySelector));
+    this->strategySelector.onChange = [this] { this->strategySelectionChanged(); };
     this->strategySelector.setJustificationType(juce::Justification::centred);
     this->strategySelector.addItem("Arousal Valence", 1);
     this->strategySelector.addItem("Colour mapping", 2);
@@ -66,7 +69,8 @@ Festivalle21AudioProcessorEditor::Festivalle21AudioProcessorEditor (Festivalle21
 
 Festivalle21AudioProcessorEditor::~Festivalle21AudioProcessorEditor()
 {
-    delete canvas;
+    delete this->CMCanvas;
+    delete this->AVCanvas;
 }
 
 //==============================================================================
@@ -101,5 +105,23 @@ void Festivalle21AudioProcessorEditor::resized()
     area.removeFromTop(30);
     this->strategySelector.setBounds(area);
     
+}
+
+void Festivalle21AudioProcessorEditor::strategySelectionChanged()
+{
+    this->audioProcessor.changeStrategy();
+    canvas->setVisible(false);
+    switch (strategySelector.getSelectedItemIndex()) {
+    case 0:
+        canvas = this->AVCanvas;
+        break;
+    case 1:
+        canvas = this->CMCanvas;
+        break;
+    default:
+        break;
+    }
+    addAndMakeVisible(this->canvas);
+    repaint();
 }
 
