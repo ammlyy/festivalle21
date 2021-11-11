@@ -16,9 +16,7 @@ Festivalle21AudioProcessorEditor::Festivalle21AudioProcessorEditor (Festivalle21
     // editor's size to whatever you need it to be.
     setSize (600, 650);
 
-    this->CMCanvas = new ColourMappingCanvas(this->valueTreeState, juce::Rectangle<int>(getLocalBounds().reduced(10)), this->audioProcessor.getStrategy());
-    this->AVCanvas = new ArousalValenceCanvas(this->valueTreeState, juce::Rectangle<int>(getLocalBounds().reduced(10)), this->audioProcessor.getStrategy());
-    this->canvas = this->CMCanvas;
+    this->canvas = new ColourMappingCanvas(this->valueTreeState, juce::Rectangle<int>(getLocalBounds().reduced(10)), this->audioProcessor.getStrategy());
     addAndMakeVisible(this->canvas);
 
     setResizable(false, false);
@@ -69,8 +67,7 @@ Festivalle21AudioProcessorEditor::Festivalle21AudioProcessorEditor (Festivalle21
 
 Festivalle21AudioProcessorEditor::~Festivalle21AudioProcessorEditor()
 {
-    delete this->CMCanvas;
-    delete this->AVCanvas;
+    delete canvas;
 }
 
 //==============================================================================
@@ -110,13 +107,14 @@ void Festivalle21AudioProcessorEditor::resized()
 void Festivalle21AudioProcessorEditor::strategySelectionChanged()
 {
     this->audioProcessor.changeStrategy();
-    canvas->setVisible(false);
+    this->canvas->setVisible(false);
+    delete this->canvas;
     switch (strategySelector.getSelectedItemIndex()) {
     case 0:
-        canvas = this->AVCanvas;
+        this->canvas = new ArousalValenceCanvas(this->valueTreeState, juce::Rectangle<int>(getLocalBounds().reduced(10)), this->audioProcessor.getStrategy());
         break;
     case 1:
-        canvas = this->CMCanvas;
+        canvas = new ColourMappingCanvas(this->valueTreeState, juce::Rectangle<int>(getLocalBounds().reduced(10)), this->audioProcessor.getStrategy());
         break;
     default:
         break;
