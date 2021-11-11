@@ -30,7 +30,7 @@ Festivalle21AudioProcessor::Festivalle21AudioProcessor()
         std::make_unique<juce::AudioParameterFloat>("manualRadius", "ManualRadius", 0.1f, 1.0f, 0.1f),
         std::make_unique<juce::AudioParameterInt>("isManual", "IsManual", 0, 1, 0),
         std::make_unique<juce::AudioParameterBool>("bypassRYB", "ByPassRYB", false),
-        std::make_unique<juce::AudioParameterInt>("strategySelection", "strategySelection", 0, 1, 0),
+        std::make_unique<juce::AudioParameterInt>("strategySelection", "StrategySelection", 0, 1, 1),
         })
 {
 #ifdef MEASURE_TIME
@@ -48,7 +48,7 @@ Festivalle21AudioProcessor::Festivalle21AudioProcessor()
 
     this->AVStrategy = new ArousalValenceStrategy(&this->treeState);
     this->CMStrategy = new ColourMappingStrategy(&this->treeState);
-    this->analisysStrategy = AVStrategy;
+    this->analisysStrategy = CMStrategy;
 }
 
 Festivalle21AudioProcessor::~Festivalle21AudioProcessor()
@@ -266,9 +266,8 @@ Strategy* Festivalle21AudioProcessor::getStrategy()
     return this->analisysStrategy;
 }
 
-void Festivalle21AudioProcessor::changeStrategy()
+void Festivalle21AudioProcessor::changeStrategy(int strat)
 {
-    int strat = (int)treeState.getRawParameterValue("strategySelection");
 
     switch (strat) {
     case 0:

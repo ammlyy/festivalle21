@@ -32,7 +32,7 @@ public:
     Festivalle21AudioProcessor();
     ~Festivalle21AudioProcessor() override;
 
-    void changeStrategy();
+    void changeStrategy(int strat);
 
     //==============================================================================
     void prepareToPlay(double sampleRate, int samplesPerBlock) override;
