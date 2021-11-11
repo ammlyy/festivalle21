@@ -111,7 +111,7 @@ void Festivalle21AudioProcessorEditor::strategySelectionChanged()
     delete this->canvas;
     switch (strategySelector.getSelectedItemIndex()) {
     case 0:
-        this->canvas = new ArousalValenceCanvas(this->valueTreeState, juce::Rectangle<int>(getLocalBounds().reduced(10)), this->audioProcessor.getStrategy());
+        this->canvas = new ArousalValenceCanvas(this->valueTreeState, juce::Rectangle<int>(getLocalBounds().reduced(10).removeFromTop(550)), this->audioProcessor.getStrategy());
         break;
     case 1:
         canvas = new ColourMappingCanvas(this->valueTreeState, juce::Rectangle<int>(getLocalBounds().reduced(10)), this->audioProcessor.getStrategy());

@@ -39,8 +39,6 @@ private:
     juce::Label ipInput;
 
     Component* canvas;
-    ArousalValenceCanvas* AVCanvas;
-    ColourMappingCanvas* CMCanvas;
     std::unique_ptr <juce::AudioProcessorValueTreeState::ComboBoxAttachment> strategySelectionAttachment;
 
     juce::ComboBox strategySelector;
