@@ -59,6 +59,7 @@ Festivalle21AudioProcessorEditor::Festivalle21AudioProcessorEditor (Festivalle21
 
     this->strategySelectionAttachment.reset(new juce::AudioProcessorValueTreeState::ComboBoxAttachment(*this->valueTreeState, "strategySelection", this->strategySelector));
     this->strategySelector.onChange = [this] { this->strategySelectionChanged(); };
+    //this->strategySelector.setSelectedId((int)valueTreeState->getRawParameterValue("strategySelection") + 1);
     this->strategySelector.setJustificationType(juce::Justification::centred);
     this->strategySelector.addItem("Arousal Valence", 1);
     this->strategySelector.addItem("Colour mapping", 2);
@@ -106,10 +107,11 @@ void Festivalle21AudioProcessorEditor::resized()
 
 void Festivalle21AudioProcessorEditor::strategySelectionChanged()
 {
-    this->audioProcessor.changeStrategy();
+    int strat = strategySelector.getSelectedItemIndex();
+    this->audioProcessor.changeStrategy(strat);
     this->canvas->setVisible(false);
     delete this->canvas;
-    switch (strategySelector.getSelectedItemIndex()) {
+    switch (strat) {
     case 0:
         this->canvas = new ArousalValenceCanvas(this->valueTreeState, juce::Rectangle<int>(getLocalBounds().reduced(10).removeFromTop(550)), this->audioProcessor.getStrategy());
         break;
