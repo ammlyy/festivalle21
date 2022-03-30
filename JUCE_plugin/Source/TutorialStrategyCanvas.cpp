@@ -16,7 +16,9 @@ TutorialStrategyCanvas::TutorialStrategyCanvas(juce::AudioProcessorValueTreeStat
 {
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
-
+    this->enableSendAttachment.reset(new juce::AudioProcessorValueTreeState::ButtonAttachment(*valueTreeState, "enableSend", this->enableSend));
+    this->enableSend.setSize(30, 30);
+    addAndMakeVisible(this->enableSend);
 }
 
 TutorialStrategyCanvas::~TutorialStrategyCanvas()
@@ -37,10 +39,6 @@ void TutorialStrategyCanvas::paint (juce::Graphics& g)
     g.setColour (juce::Colours::grey);
     g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
 
-    g.setColour (juce::Colours::white);
-    g.setFont (14.0f);
-    g.drawText ("TutorialStrategyCanvas", getLocalBounds(),
-                juce::Justification::centred, true);   // draw some placeholder text
 }
 
 void TutorialStrategyCanvas::resized()
