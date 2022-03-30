@@ -31,6 +31,7 @@ Festivalle21AudioProcessor::Festivalle21AudioProcessor()
         std::make_unique<juce::AudioParameterInt>("isManual", "IsManual", 0, 1, 0),
         std::make_unique<juce::AudioParameterBool>("bypassRYB", "ByPassRYB", false),
         std::make_unique<juce::AudioParameterInt>("strategySelection", "StrategySelection", 0, 1, 1),
+        std::make_unique<juce::AudioParameterBool>("enableSend", "EnableSend", false),
         })
 {
 #ifdef MEASURE_TIME

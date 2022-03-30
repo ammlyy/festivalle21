@@ -12,7 +12,7 @@
 #include "TutorialStrategyCanvas.h"
 
 //==============================================================================
-TutorialStrategyCanvas::TutorialStrategyCanvas()
+TutorialStrategyCanvas::TutorialStrategyCanvas(juce::AudioProcessorValueTreeState* valueTreeState)
 {
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.

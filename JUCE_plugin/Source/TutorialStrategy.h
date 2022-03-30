@@ -9,3 +9,16 @@
 */
 
 #pragma once
+
+#include <JuceHeader.h>
+#include "Strategy.h"
+
+class TutorialStrategy : public Strategy
+{
+public:
+    TutorialStrategy();
+    ~TutorialStrategy();
+
+    void processBuffer(juce::AudioBuffer<float>& buffer, int totalNumInputChannels, juce::OSCSender* sender) override;
+
+};
