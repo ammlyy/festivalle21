@@ -7,6 +7,10 @@
   <MAINGROUP id="o6mKob" name="OSC_toolkit">
     <GROUP id="{8919C6B9-B79B-DB30-D6F5-6F616A95C221}" name="Source">
       <GROUP id="{05F4DA22-9E35-20A6-E112-0B8955AE1466}" name="Strategies">
+        <FILE id="pwfsGi" name="TutorialStrategy.cpp" compile="1" resource="0"
+              file="Source/TutorialStrategy.cpp"/>
+        <FILE id="WOixjL" name="TutorialStrategy.h" compile="0" resource="0"
+              file="Source/TutorialStrategy.h"/>
         <FILE id="lzLjW5" name="ArousalValenceStrategy.cpp" compile="1" resource="0"
               file="Source/ArousalValenceStrategy.cpp"/>
         <FILE id="auq8GJ" name="ColourMappingStrategy.cpp" compile="1" resource="0"
@@ -19,6 +23,10 @@
         <FILE id="BlNEmY" name="Strategy.h" compile="0" resource="0" file="Source/Strategy.h"/>
       </GROUP>
       <GROUP id="{C95EA35B-123B-BC07-C6A6-DD02043753AC}" name="GUI">
+        <FILE id="nE18OE" name="TutorialStrategyCanvas.cpp" compile="1" resource="0"
+              file="Source/TutorialStrategyCanvas.cpp"/>
+        <FILE id="Z6mI7d" name="TutorialStrategyCanvas.h" compile="0" resource="0"
+              file="Source/TutorialStrategyCanvas.h"/>
         <FILE id="mZZuUF" name="ArousalValenceCanvas.cpp" compile="1" resource="0"
               file="Source/ArousalValenceCanvas.cpp"/>
         <FILE id="yCYcH8" name="ArousalValenceCanvas.h" compile="0" resource="0"
