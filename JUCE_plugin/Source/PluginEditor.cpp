@@ -63,6 +63,7 @@ Festivalle21AudioProcessorEditor::Festivalle21AudioProcessorEditor (Festivalle21
     this->strategySelector.setJustificationType(juce::Justification::centred);
     this->strategySelector.addItem("Arousal Valence", 1);
     this->strategySelector.addItem("Colour mapping", 2);
+    this->strategySelector.addItem("Tutorial", 3);
     addAndMakeVisible(strategySelector);
 }
 
@@ -118,6 +119,9 @@ void Festivalle21AudioProcessorEditor::strategySelectionChanged()
         break;
     case 1:
         canvas = new ColourMappingCanvas(this->valueTreeState, juce::Rectangle<int>(getLocalBounds().reduced(10)), this->audioProcessor.getStrategy());
+        break;
+    case 2:
+        canvas = new TutorialStrategyCanvas(this->valueTreeState, juce::Rectangle<int>(getLocalBounds().removeFromTop(550)));
         break;
     default:
         break;

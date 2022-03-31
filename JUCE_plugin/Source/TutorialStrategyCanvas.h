@@ -18,7 +18,7 @@
 class TutorialStrategyCanvas  : public juce::Component
 {
 public:
-    TutorialStrategyCanvas(juce::AudioProcessorValueTreeState* valueTreeState);
+    TutorialStrategyCanvas(juce::AudioProcessorValueTreeState* valueTreeState, juce::Rectangle<int> area);
     ~TutorialStrategyCanvas() override;
 
     void paint (juce::Graphics&) override;

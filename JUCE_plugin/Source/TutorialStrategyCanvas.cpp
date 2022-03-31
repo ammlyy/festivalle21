@@ -12,10 +12,11 @@
 #include "TutorialStrategyCanvas.h"
 
 //==============================================================================
-TutorialStrategyCanvas::TutorialStrategyCanvas(juce::AudioProcessorValueTreeState* valueTreeState)
+TutorialStrategyCanvas::TutorialStrategyCanvas(juce::AudioProcessorValueTreeState* valueTreeState, juce::Rectangle<int> area)
 {
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
+    setSize(area.getWidth(), area.getHeight());
     this->enableSendAttachment.reset(new juce::AudioProcessorValueTreeState::ButtonAttachment(*valueTreeState, "enableSend", this->enableSend));
     this->enableSend.setSize(30, 30);
     addAndMakeVisible(this->enableSend);
