@@ -1,7 +1,7 @@
 # OSC-toolkit
 
 This repository started as an OSC protocol-powered stage lighting control system but has since then become a more abstract oriented plugin to implement
-custom audio analisys and send results via the OSC protocol.
+custom audio analisys and send results via the OSC protocol. Its utility lies in the ability to make any DAW communicate with every other program accepting data via OSC protocol in a custom way. 
 
 Check the [tutorial on how to add new strategies](https://github.com/ammlyy/festivalle21/wiki/Tutorial:-Add-a-new-strategy) to start implementing your own analisys strategies.
 
