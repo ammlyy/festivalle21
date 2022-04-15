@@ -26,5 +26,6 @@ void TutorialStrategy::processBuffer(juce::AudioBuffer<float>& buffer, int total
     if (*treeState->getRawParameterValue("enableSend") == 1.0f) {
         auto max = buffer.getMagnitude(0, buffer.getNumSamples());
         sender->send(this->addresses[0], juce::OSCArgument(max));
+        this->data[0] = max;
     }
 }
