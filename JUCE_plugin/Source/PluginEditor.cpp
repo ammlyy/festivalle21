@@ -110,7 +110,6 @@ void Festivalle21AudioProcessorEditor::strategySelectionChanged()
 {
     int strat = strategySelector.getSelectedItemIndex();
     this->audioProcessor.changeStrategy(strat);
-    DBG(strat);
     this->canvas->setVisible(false);
     delete this->canvas;
     switch (strat) {
