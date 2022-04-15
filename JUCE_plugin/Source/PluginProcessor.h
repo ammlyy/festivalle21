@@ -13,6 +13,7 @@
 #include <string>
 #include "ArousalValenceStrategy.h"
 #include "ColourMappingStrategy.h"
+#include "TutorialStrategy.h"
 
 #define PI 3.14159265
 #define BUFFER_SIZE 22050 //500 ms at 44.1kHz

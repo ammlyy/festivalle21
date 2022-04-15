@@ -13,6 +13,7 @@
 #include "MyKnob.h"
 #include "ColourMappingCanvas.h"
 #include "ArousalValenceCanvas.h"
+#include "TutorialStrategyCanvas.h"
 
 //==============================================================================
 /**

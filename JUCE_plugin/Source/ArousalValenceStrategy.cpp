@@ -10,6 +10,7 @@
 
 #include <JuceHeader.h>
 #include "ArousalValenceStrategy.h"
+#include "TutorialStrategy.h"
 
 //==============================================================================
 

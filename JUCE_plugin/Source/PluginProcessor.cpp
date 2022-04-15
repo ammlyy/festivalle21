@@ -31,6 +31,7 @@ Festivalle21AudioProcessor::Festivalle21AudioProcessor()
         std::make_unique<juce::AudioParameterInt>("isManual", "IsManual", 0, 1, 0),
         std::make_unique<juce::AudioParameterBool>("bypassRYB", "ByPassRYB", false),
         std::make_unique<juce::AudioParameterInt>("strategySelection", "StrategySelection", 0, 1, 1),
+        std::make_unique<juce::AudioParameterBool>("enableSend", "EnableSend", false),
         })
 {
 #ifdef MEASURE_TIME
@@ -268,6 +269,13 @@ Strategy* Festivalle21AudioProcessor::getStrategy()
 
 void Festivalle21AudioProcessor::changeStrategy(int strat)
 {
+    /*this control is needed since the analisys strategies implementing a neural network must be allocated in the constructor and 
+    can't be dinamically allocated*/
+    if (this->analisysStrategy->getAddresses()[0] != "/juce/RGB/R") {
+        if (this->analisysStrategy->getAddresses()[0] != "/juce/AV/A") {
+            delete this->analisysStrategy;
+        }
+    }
 
     switch (strat) {
     case 0:
@@ -276,6 +284,8 @@ void Festivalle21AudioProcessor::changeStrategy(int strat)
     case 1:
         this->analisysStrategy = this->CMStrategy;
         break;
+    case 2:
+        this->analisysStrategy = new TutorialStrategy(&this->treeState);
     default:
         break;
     }
