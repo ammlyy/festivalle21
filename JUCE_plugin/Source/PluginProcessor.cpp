@@ -57,8 +57,14 @@ Festivalle21AudioProcessor::~Festivalle21AudioProcessor()
 #ifdef MEASURE_TIME
     this->myfile.close();
 #endif
+    if (this->analisysStrategy->getAddresses()[0] != "/juce/RGB/R") {
+        if (this->analisysStrategy->getAddresses()[0] != "/juce/AV/A") {
+            delete this->analisysStrategy;
+        }
+    }
     delete this->AVStrategy;
     delete this->CMStrategy;
+
 }
 
 //==============================================================================
