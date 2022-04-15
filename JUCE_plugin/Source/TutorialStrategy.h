@@ -16,9 +16,11 @@
 class TutorialStrategy : public Strategy
 {
 public:
-    TutorialStrategy();
+    TutorialStrategy(juce::AudioProcessorValueTreeState* treeState);
     ~TutorialStrategy();
 
     void processBuffer(juce::AudioBuffer<float>& buffer, int totalNumInputChannels, juce::OSCSender* sender) override;
 
+private:
+    juce::AudioProcessorValueTreeState* treeState;
 };
